@@ -16,6 +16,7 @@ int brake = 0;
 int right_stepper_pin[3] = { 29, 25, 50 };  // pulse, dir , en
 int left_stepper_pin[3] = { 39, 35, 53 };
 long int imu_start;
+long int update_data;
 
 float roll = 0;
 float pitch = 0;
@@ -48,6 +49,7 @@ int speed_setting = 505;
 void setup() {
   // put your setp code here, to run once:
   Serial.begin(115200);
+  Serial2.begin(9600);
 
   
   ibus_setup();
@@ -55,6 +57,9 @@ void setup() {
   stepper_setup();
 
   imu_start = millis();
+  update_data = millis();
+  connectToWiFi();
+
 }
 
 void loop() {
@@ -64,10 +69,16 @@ void loop() {
 
   loop_time = micros() - loopstart;
 
-  // if (millis() - imu_start > 10) {
-  //   imu_start = millis();
-  //  imu();
-  // }
+  if (millis() - imu_start > 50) {
+    imu();
+    imu_start = millis();
+  }
+
+   if (millis() - update_data > 1000) {
+    updateData();
+    update_data = millis();
+
+  }
   send_data();
 
 }
@@ -102,15 +113,15 @@ void send_data(){
     Serial.print(" ");
 
 
-    // Serial.print(" ");
-    // Serial.print(roll);
-    // Serial.print(" ");
-    // Serial.print(pitch);
-    // Serial.print(" ");
-    // Serial.print(yaw);
+    Serial.print(" ");
+    Serial.print(roll);
+    Serial.print(" ");
+    Serial.print(pitch);
+    Serial.print(" ");
+    Serial.print(yaw);
     // Serial.print(" ");
     // Serial.print(target_angle);
-    // Serial.print(" Mag: ");Serial.print(JY901.stcMag.h[0]);Serial.print(" ");Serial.print(JY901.stcMag.h[1]);Serial.print(" ");Serial.print(JY901.stcMag.h[2]);
+    Serial.print(" Mag: ");Serial.print(JY901.stcMag.h[0]);Serial.print(" ");Serial.print(JY901.stcMag.h[1]);Serial.print(" ");Serial.print(JY901.stcMag.h[2]);
 
     
     Serial.println();
@@ -122,7 +133,7 @@ void imu() {
   pitch = (float)JY901.stcAngle.Angle[1] / 32768 * 180;
   yaw = (float)JY901.stcAngle.Angle[2] / 32768 * 180;
 
-  while (Serial1.available()) {
-    JY901.CopeSerialData(Serial1.read());  //Call JY901 data cope function
+  while (Serial2.available()) {
+    JY901.CopeSerialData(Serial2.read());  //Call JY901 data cope function
   }
 }
