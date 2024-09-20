@@ -1,13 +1,14 @@
 #include <Wire.h>
 #include <JY901.h>
+#include <WiFi.h>
+#include <WiFiClient.h>                  
 
 int  ch[15];
-
 int brake_pin[2] = { 4,3};  // pulse, dir , en
 int brake_dir_pin[2] = { 5,2};  // pulse, dir , en
 long int right_motor_step_count = 0;
 long int left_motor_step_count = 0;
-
+long int total_steps = 0;
 float target_angle = 0; 
 float error_direction = 0;
 
@@ -44,6 +45,7 @@ int bot_direction = 0;
 
 
 int speed_setting = 505;
+long rssi = 0;  // Get the RSSI value
 
 
 void setup() {
@@ -66,7 +68,6 @@ void loop() {
   loopstart = micros();
   ibus_loop();
   move_bot();
-
   loop_time = micros() - loopstart;
 
   if (millis() - imu_start > 50) {
@@ -74,12 +75,14 @@ void loop() {
     imu_start = millis();
   }
 
-   if (millis() - update_data > 1000) {
-    updateData();
+   if (millis() - update_data > 3000) {
+    send_data();
     update_data = millis();
+    Serial.println("Sending");
+    updateData();
+    Serial.println(millis()-update_data);
 
   }
-  send_data();
 
 }
 

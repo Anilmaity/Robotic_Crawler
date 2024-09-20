@@ -30,6 +30,7 @@ void move_bot() {
 
   if (motor1_speed > 10) {
     digitalWrite(right_stepper_pin[1], HIGH);
+    total_steps +=1;
   } else if (motor1_speed < -10) {
     digitalWrite(right_stepper_pin[1], LOW);
   }
@@ -37,12 +38,14 @@ void move_bot() {
 
   if (motor2_speed > 10) {
     digitalWrite(left_stepper_pin[1], LOW);
+
   } else if (motor2_speed < -10) {
     digitalWrite(left_stepper_pin[1], HIGH);
   }
 
   if (abs(motor1_speed) > 10) {
     digitalWrite(right_stepper_pin[0], HIGH);
+    total_steps +=1;
   }
   if (abs(motor2_speed) > 10) {
     digitalWrite(left_stepper_pin[0], HIGH);
