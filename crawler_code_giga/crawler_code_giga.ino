@@ -11,7 +11,7 @@ long int left_motor_step_count = 0;
 long int total_steps = 0;
 float target_angle = 0; 
 float error_direction = 0;
-
+bool no_360 = true;
 int brake = 0;
 
 int right_stepper_pin[3] = { 29, 25, 50 };  // pulse, dir , en

@@ -28,15 +28,20 @@ void move_bot() {
     motor2_speed = -500;
   }
 
-  if (motor1_speed > 10) {
+  if (motor1_speed > 10) { 
+   if(no_360 && motor2_speed < -10 ){ motor1_speed = 0; }
+
     digitalWrite(right_stepper_pin[1], HIGH);
     total_steps +=1;
   } else if (motor1_speed < -10) {
+
     digitalWrite(right_stepper_pin[1], LOW);
   }
 
 
-  if (motor2_speed > 10) {
+  if (motor2_speed > 10) {  
+    if(no_360 && motor1_speed < -10 ){ motor2_speed = 0; }
+
     digitalWrite(left_stepper_pin[1], LOW);
 
   } else if (motor2_speed < -10) {
@@ -51,6 +56,9 @@ void move_bot() {
     digitalWrite(left_stepper_pin[0], HIGH);
   }
 
+  if (abs(motor2_speed) > abs(motor1_speed)) {
+    motor1_speed = motor2_speed;
+ }
 
   delayMicroseconds(speed_setting - abs(motor1_speed));  // 300 microsecond 24 rpm  30 rpm. 230
 

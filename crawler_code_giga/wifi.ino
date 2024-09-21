@@ -5,8 +5,11 @@ const unsigned long session_id = random(1000000000, 9999999999);
 // WiFi credentials
 const char* ssid = "Anil";
 const char* password = "9558779895";
+const char* ssid2 = "ARS";
+const char* password2 = "9925512860";
+const char* ssid3 = "Anmol's Iphone 2";
+const char* password3 = "Anmolshah";
 
-// Server details
 const char* serverName = "arnobot.live";  // Domain of your HTTP server
 const int serverPort = 80;                // HTTP port
 
@@ -31,36 +34,55 @@ String rc_status = "ACTIVE";
 int current_payload = 0;
 bool wifi_connected = true;
 
-bool check_hotspot(String name = "Anil") {
-  // scan for nearby networks:
+struct HotspotCredentials {
+  String ssid;
+  String password;
+};
+
+// Function to check and return the hotspot credentials
+HotspotCredentials check_hotspot(String preferred_ssid = "Anil") {
   Serial.println("** Scan Networks **");
   int numSsid = WiFi.scanNetworks();
-  if (numSsid != -1)
+  delay(2000);
+  if (numSsid == -1) {
+    Serial.println("No networks found");
+    return { "", "" };  // Return empty if no networks found
+  }
 
-    // print the list of networks seen:
-    Serial.print("number of available networks: ");
+  Serial.print("Number of available networks: ");
   Serial.println(numSsid);
 
-  // print the network number and name for each network found:
+  // Loop through the available networks
   for (int thisNet = 0; thisNet < numSsid; thisNet++) {
-      Serial.println(WiFi.SSID(thisNet));
+    Serial.println(WiFi.SSID(thisNet));
 
-    if (WiFi.SSID(thisNet) == name) {
-      return true;
+    if (WiFi.SSID(thisNet) == String(ssid)) {
+      return { ssid, password };
+    } else if (WiFi.SSID(thisNet) == String(ssid2)) {
+      return { ssid2, password2 };
+    } else if (WiFi.SSID(thisNet) == String(ssid3)) {
+      return { ssid3, password3 };
     }
   }
 
-    return false;
-  }
+  return { "", "" };  // Return empty if none of the networks match
+}
+
 
 
 void connectToWiFi() {
   Serial.print("Connecting to WiFi...");
-  if (check_hotspot()) {
-    WiFi.begin(ssid, password);
+  HotspotCredentials creds = check_hotspot();
+
+  if (creds.ssid != "") {
+    Serial.print("Connecting to SSID: ");
+    Serial.println(creds.ssid);
     long int wait_time = millis();
+
+    WiFi.begin(creds.ssid.c_str(), creds.password.c_str());
+    
     while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
+      delay(100);
       Serial.print(".");
       if ((millis() - wait_time) > 2000) {  // Timeout after 20 seconds
         Serial.println("\nCould not connect to WiFi!");
@@ -71,7 +93,14 @@ void connectToWiFi() {
     Serial.println("\nConnected to WiFi!");
     delay(1000);
   }
+
+  // Connect using creds.ssid and creds.password
+  else {
+    Serial.println("No matching hotspot found.");
+  }
 }
+
+
 
 String generateSessionID() {
   // Generate a random 32-bit number and convert to string
@@ -188,7 +217,9 @@ void updateData() {
     if (successObtained) {
       Serial.println("\nSuccess response obtained.");
     } else {
-      Serial.println("\nTimeout or different response received.");
+      Serial.println("\nTimeout or different response received.");     
+     wifi_connected = false;
+
     }
 
     // Serial.println("Time Taken to obtain response");
@@ -199,50 +230,50 @@ void updateData() {
 
 
 
-  void printEncryptionType(int thisType) {
-    // read the encryption type and print out the name:
-    switch (thisType) {
-      case ENC_TYPE_WEP:
-        Serial.print("WEP");
-        break;
-      case ENC_TYPE_WPA:
-        Serial.print("WPA");
-        break;
-      case ENC_TYPE_WPA2:
-        Serial.print("WPA2");
-        break;
-      case ENC_TYPE_NONE:
-        Serial.print("None");
-        break;
-      case ENC_TYPE_AUTO:
-        Serial.print("Auto");
-        break;
-      case ENC_TYPE_WPA3:
-        Serial.print("WPA3");
-        break;
-      case ENC_TYPE_UNKNOWN:
-      default:
-        Serial.print("Unknown");
-        break;
-    }
+void printEncryptionType(int thisType) {
+  // read the encryption type and print out the name:
+  switch (thisType) {
+    case ENC_TYPE_WEP:
+      Serial.print("WEP");
+      break;
+    case ENC_TYPE_WPA:
+      Serial.print("WPA");
+      break;
+    case ENC_TYPE_WPA2:
+      Serial.print("WPA2");
+      break;
+    case ENC_TYPE_NONE:
+      Serial.print("None");
+      break;
+    case ENC_TYPE_AUTO:
+      Serial.print("Auto");
+      break;
+    case ENC_TYPE_WPA3:
+      Serial.print("WPA3");
+      break;
+    case ENC_TYPE_UNKNOWN:
+    default:
+      Serial.print("Unknown");
+      break;
   }
+}
 
-  void print2Digits(byte thisByte) {
-    if (thisByte < 0xF) {
+void print2Digits(byte thisByte) {
+  if (thisByte < 0xF) {
+    Serial.print("0");
+  }
+  Serial.print(thisByte, HEX);
+}
+
+void printMacAddress(byte mac[]) {
+  for (int i = 0; i < 6; i++) {
+    if (i > 0) {
+      Serial.print(":");
+    }
+    if (mac[i] < 16) {
       Serial.print("0");
     }
-    Serial.print(thisByte, HEX);
+    Serial.print(mac[i], HEX);
   }
-
-  void printMacAddress(byte mac[]) {
-    for (int i = 0; i < 6; i++) {
-      if (i > 0) {
-        Serial.print(":");
-      }
-      if (mac[i] < 16) {
-        Serial.print("0");
-      }
-      Serial.print(mac[i], HEX);
-    }
-    Serial.println();
-  }
+  Serial.println();
+}
