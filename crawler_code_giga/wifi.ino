@@ -27,7 +27,7 @@ float longitude = -122.4194;
 int internal_temperature = 25;
 int external_temperature = 30;
 float magnetic_strength = 1.2;
-float voltage = 12.5;
+float voltage = 48;
 int current_height = 1000;
 int connection_speed = 500;
 String rc_status = "ACTIVE";
@@ -43,7 +43,7 @@ struct HotspotCredentials {
 HotspotCredentials check_hotspot(String preferred_ssid = "Anil") {
   Serial.println("** Scan Networks **");
   int numSsid = WiFi.scanNetworks();
-  delay(2000);
+    blinking(200, 200, 0, 0, 255);  // Call blinking with red color (255, 0, 0)
   if (numSsid == -1) {
     Serial.println("No networks found");
     return { "", "" };  // Return empty if no networks found
@@ -82,7 +82,7 @@ void connectToWiFi() {
     WiFi.begin(creds.ssid.c_str(), creds.password.c_str());
     
     while (WiFi.status() != WL_CONNECTED) {
-      delay(100);
+    blinking(200, 200, 0, 0, 255);  // Call blinking with red color (255, 0, 0)
       Serial.print(".");
       if ((millis() - wait_time) > 2000) {  // Timeout after 20 seconds
         Serial.println("\nCould not connect to WiFi!");
@@ -98,6 +98,11 @@ void connectToWiFi() {
   else {
     Serial.println("No matching hotspot found.");
   }
+
+white();
+delay(100);
+white();
+off();
 }
 
 
@@ -117,11 +122,11 @@ String createPayload() {
   payload += "&roll=" + String(roll);
   payload += "&pitch=" + String(pitch);
   payload += "&yaw=" + String(yaw);
-  payload += "&power=" + String(power);
+  payload += "&power=" + String(int(current_value * 48/1000));
   payload += "&active_sensors=" + String(active_sensors);
   payload += "&total_sensors=" + String(total_sensors);
   payload += "&rpm=" + String(bot_speed);
-  payload += "&distance=" + String(total_steps);
+  payload += "&distance=" + String(position/200);
   payload += "&latitude=" + String(latitude, 6);    // 6 decimal places for precision
   payload += "&longitude=" + String(longitude, 6);  // 6 decimal places for precision
   payload += "&internal_temp=" + String(internal_temperature);
