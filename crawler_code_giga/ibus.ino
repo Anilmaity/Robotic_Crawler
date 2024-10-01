@@ -14,12 +14,20 @@ void ibus_loop() {
     int value = receiver.get(i);
     if (value >= 1000 && value <= 2000) {
       ch[i] = value;
-      rc_connected = true;
+    }
+    if (ch[10] > 1000) {
+      rc_connected = true;  // 912
+    } else {
+      rc_connected = false;
     }
     //Serial.print(receiver.get(i));
     //Serial.print('\t');
+    if (ch[8] == 2000 && wifi_connected == false) {
+      connectToWiFi();  // 912
+      ch[8] = 1500;
+    }
   }
-  if (rc_connected==true) {
+  if (rc_connected == true) {
 
     //Serial.println(receiver.get(0));  // received packet quality. If 0 -> there are some corrupted values
 
@@ -70,24 +78,26 @@ void ibus_loop() {
           speed_setting = 600;
         }
       }
-      if (ch[8] == 2000) {
-        connectToWiFi();  // 912
-      }
+
+
       if (ch[9] == 2000) {
-        total_steps = 0;  // 912
+        encoder_value = 0;  // 912
       }
-      // if (abs(bot_direction) + abs(bot_speed) > 0) {
-      //   green();  // 912
-      // } else {
-      //   blue();
-      // }
+      if (abs(bot_direction) + abs(bot_speed) > 0) {
+        bot_mode = "RUNNING";
+      } else {
+        bot_mode = "IDLE";
+      }
     } else {
-      white();
+      bot_mode = "OFF";
       bot_speed = 0;
     }
   }
 
   else {
-    blinking(200, 200, 255, 0, 0);  // Call blinking with red color (255, 0, 0)
+    bot_speed = 0;
+    bot_direction = 0;
+    bot_mode = "RC_ERROR";
+    // Call blinking with red color (255, 0, 0)
   }
 }

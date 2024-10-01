@@ -32,7 +32,6 @@ int current_height = 1000;
 int connection_speed = 500;
 String rc_status = "ACTIVE";
 int current_payload = 0;
-bool wifi_connected = true;
 
 struct HotspotCredentials {
   String ssid;
@@ -43,7 +42,6 @@ struct HotspotCredentials {
 HotspotCredentials check_hotspot(String preferred_ssid = "Anil") {
   Serial.println("** Scan Networks **");
   int numSsid = WiFi.scanNetworks();
-    blinking(200, 200, 0, 0, 255);  // Call blinking with red color (255, 0, 0)
   if (numSsid == -1) {
     Serial.println("No networks found");
     return { "", "" };  // Return empty if no networks found
@@ -82,7 +80,6 @@ void connectToWiFi() {
     WiFi.begin(creds.ssid.c_str(), creds.password.c_str());
     
     while (WiFi.status() != WL_CONNECTED) {
-    blinking(200, 200, 0, 0, 255);  // Call blinking with red color (255, 0, 0)
       Serial.print(".");
       if ((millis() - wait_time) > 2000) {  // Timeout after 20 seconds
         Serial.println("\nCould not connect to WiFi!");
@@ -90,8 +87,8 @@ void connectToWiFi() {
         return;
       }
     }
+    wifi_connected = true;
     Serial.println("\nConnected to WiFi!");
-    delay(1000);
   }
 
   // Connect using creds.ssid and creds.password
@@ -99,10 +96,6 @@ void connectToWiFi() {
     Serial.println("No matching hotspot found.");
   }
 
-white();
-delay(100);
-white();
-off();
 }
 
 
@@ -122,11 +115,11 @@ String createPayload() {
   payload += "&roll=" + String(roll);
   payload += "&pitch=" + String(pitch);
   payload += "&yaw=" + String(yaw);
-  payload += "&power=" + String(int(current_value * 48/1000));
+  payload += "&power=" + String(int(current_value * 1.39));
   payload += "&active_sensors=" + String(active_sensors);
   payload += "&total_sensors=" + String(total_sensors);
   payload += "&rpm=" + String(bot_speed);
-  payload += "&distance=" + String(position/200);
+  payload += "&distance=" + String((distance_travel));
   payload += "&latitude=" + String(latitude, 6);    // 6 decimal places for precision
   payload += "&longitude=" + String(longitude, 6);  // 6 decimal places for precision
   payload += "&internal_temp=" + String(internal_temperature);
@@ -215,7 +208,8 @@ void updateData() {
       }
 
       // Allow other tasks to run (important in embedded systems)
-      yield();
+      move_bot();
+;
     }
 
     // Print final status

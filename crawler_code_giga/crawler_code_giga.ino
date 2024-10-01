@@ -15,12 +15,12 @@ float error_direction = 0;
 bool no_360 = true;
 int brake = 0;
 bool white_off = true;
-float position = 0;
-int position_A = 0;
-int position_B = 0;
+
+volatile float distance_travel = 0;
+volatile long int encoder_value = 0;
 
 int right_stepper_pin[3] = { 29, 25, 50 };  // pulse, dir , en
-int left_stepper_pin[3] = { 39, 35, 53 };
+int left_stepper_pin[3] = { 39, 35, 52 };
 long int imu_start;
 long int update_data;
 
@@ -53,82 +53,92 @@ int speed_setting = 505;
 long rssi = 0;  // Get the RSSI value
 
 // current reading
-float current_value= 0;
+float current_value = 0;
 
+String bot_mode = "OFF";
+String previous_bot_mode = "IDLE";
+// WIFI
+bool wifi_connected = true;
 
 void setup() {
   leds_setup();
   red();
-  oled_setup();
+  //oled_setup();
   // put your setp code here, to run once:
-  Serial.begin(115200);
+  Serial.begin(921600);
   Serial2.begin(9600);
   encoder_setup();
   current_setup();
   ibus_setup();
-  //brakesetup();
   stepper_setup();
   imu_start = millis();
   update_data = millis();
+
+
   connectToWiFi();
+  white();
 }
 
 void loop() {
+  loop_time = millis() - loopstart;
   loopstart = millis();
   ibus_loop();
   move_bot();
-  loop_time = millis() - loopstart;
-  // test();
   if (millis() - imu_start > 50) {
     imu();
+    //send_data();
     imu_start = millis();
   }
-  current_reading();
-  send_data();
-
+  //send_data();
+  led_control();
   if (millis() - update_data > 3000) {
-    //white();
     send_data();
-    update_data = millis();
-    Serial.println("Sending");
     updateData();
     Serial.println(millis() - update_data);
-    //off();
+    update_data = millis();  
+    current_reading();
+
   }
 }
 
 void send_data() {
-  Serial.print(" ");
-  Serial.print(ch[1]);
-  Serial.print(" ");
-  Serial.print(ch[2]);
-  Serial.print(" ");
-  Serial.print(ch[3]);
-  Serial.print(" ");
-  Serial.print(ch[4]);
-  Serial.print(" ");
-  Serial.print(ch[5]);
-  Serial.print(" ");
-  Serial.print(ch[6]);
-  Serial.print(" ");
-  Serial.print(ch[7]);
-  Serial.print(" ");
+  // Serial.print(" ");
+  // Serial.print(ch[1]);
+  // Serial.print(" ");
+  // Serial.print(ch[2]);
+  // Serial.print(" ");
+  // Serial.print(ch[3]);
+  // Serial.print(" ");
+  // Serial.print(ch[4]);
+  // Serial.print(" ");
+  // Serial.print(ch[5]);
+  // Serial.print(" ");
   Serial.print(ch[8]);
-  Serial.print("   ");
-  Serial.print(bot_speed);
   Serial.print(" ");
-  Serial.print(bot_direction);
+  Serial.print(ch[9]);
   Serial.print(" ");
-  Serial.print(motor1_speed);
+  Serial.print(ch[10]);
   Serial.print(" ");
-  Serial.print(motor2_speed);
-
+  // Serial.print(bot_speed);
+  // Serial.print(" ");
+  // Serial.print(bot_direction);
+  // Serial.print(" ");
+  // Serial.print(motor1_speed);
+  // Serial.print(" ");
+  // Serial.print(motor2_speed);
+  // Serial.print(" ");
+  Serial.print(current_value);
   Serial.print(" ");
-  Serial.print(position);
+  //Serial.print(encoder_value);
+  //Serial.print(" ");
+  Serial.print(distance_travel);
+  Serial.print(" ");
+  Serial.print(wifi_connected);
   Serial.print(" ");
   Serial.print(loop_time);
   Serial.print(" ");
-
+  Serial.print(bot_mode);
+  Serial.print(" ");
 
   // Serial.print(" ");
   // Serial.print(roll);
