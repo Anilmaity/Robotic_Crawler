@@ -15,6 +15,8 @@ float error_direction = 0;
 bool no_360 = true;
 int brake = 0;
 bool white_off = true;
+bool lights_on = false;
+
 
 volatile float distance_travel = 0;
 volatile long int encoder_value = 0;
@@ -49,7 +51,7 @@ int bot_speed = 0;
 int bot_direction = 0;
 
 
-int speed_setting = 505;
+int speed_setting = 700;
 long rssi = 0;  // Get the RSSI value
 
 // current reading
@@ -62,8 +64,8 @@ bool wifi_connected = true;
 
 void setup() {
   leds_setup();
-  red();
-  //oled_setup();
+  //red();
+  oled_setup();
   // put your setp code here, to run once:
   Serial.begin(921600);
   Serial2.begin(9600);
@@ -73,26 +75,27 @@ void setup() {
   stepper_setup();
   imu_start = millis();
   update_data = millis();
-
-
   connectToWiFi();
-  white();
+  //white();
 }
 
 void loop() {
   loop_time = millis() - loopstart;
   loopstart = millis();
-  ibus_loop();
   move_bot();
   if (millis() - imu_start > 50) {
     imu();
+    //update_imu();
     //send_data();
     imu_start = millis();
   }
   //send_data();
   led_control();
   if (millis() - update_data > 3000) {
-    send_data();
+    send_data();  
+    //update_imu();
+    //clear_display();
+    //default_text();
     updateData();
     Serial.println(millis() - update_data);
     update_data = millis();  
@@ -113,20 +116,20 @@ void send_data() {
   // Serial.print(" ");
   // Serial.print(ch[5]);
   // Serial.print(" ");
-  Serial.print(ch[8]);
-  Serial.print(" ");
-  Serial.print(ch[9]);
-  Serial.print(" ");
-  Serial.print(ch[10]);
-  Serial.print(" ");
+  // Serial.print(ch[8]);
+  // Serial.print(" ");
+  // Serial.print(ch[9]);
+  // Serial.print(" ");
+  // Serial.print(ch[10]);
+  // Serial.print(" ");
   // Serial.print(bot_speed);
   // Serial.print(" ");
   // Serial.print(bot_direction);
   // Serial.print(" ");
-  // Serial.print(motor1_speed);
-  // Serial.print(" ");
-  // Serial.print(motor2_speed);
-  // Serial.print(" ");
+   Serial.print(motor1_speed);
+   Serial.print(" ");
+   Serial.print(motor2_speed);
+   Serial.print(" ");
   Serial.print(current_value);
   Serial.print(" ");
   //Serial.print(encoder_value);
@@ -140,14 +143,14 @@ void send_data() {
   Serial.print(bot_mode);
   Serial.print(" ");
 
+  Serial.print(" ");
+  Serial.print(roll);
+  Serial.print(" ");
+  Serial.print(pitch);
+  Serial.print(" ");
+  Serial.print(yaw);
   // Serial.print(" ");
-  // Serial.print(roll);
-  // Serial.print(" ");
-  // Serial.print(pitch);
-  // Serial.print(" ");
-  // Serial.print(yaw);
-  // // Serial.print(" ");
-  // // Serial.print(target_angle);
+  // Serial.print(target_angle);
   // Serial.print(" Mag: ");
   // Serial.print(JY901.stcMag.h[0]);
   // Serial.print(" ");

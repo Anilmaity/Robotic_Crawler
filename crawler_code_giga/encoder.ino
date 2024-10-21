@@ -4,7 +4,8 @@
 volatile int last_encA_state = LOW;
 
 void encoder_setup() {
-
+ pinMode(ENC_A, INPUT_PULLUP);  // Enable internal pull-up for pin A
+  pinMode(ENC_B, INPUT_PULLUP);  // Enable internal pull-up for pin B
   // Attach interrupt to ENC_A pin for state change
   attachInterrupt(digitalPinToInterrupt(ENC_A), updateEncoder, CHANGE); 
  pinMode(ENC_A, INPUT_PULLUP);  // Enable internal pull-up for pin A

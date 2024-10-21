@@ -20,13 +20,13 @@ void ibus_loop() {
     } else {
       rc_connected = false;
     }
-    //Serial.print(receiver.get(i));
-    //Serial.print('\t');
+
     if (ch[8] == 2000 && wifi_connected == false) {
       connectToWiFi();  // 912
       ch[8] = 1500;
     }
   }
+
   if (rc_connected == true) {
 
     //Serial.println(receiver.get(0));  // received packet quality. If 0 -> there are some corrupted values
@@ -49,17 +49,11 @@ void ibus_loop() {
         bot_direction = 0;  // 912
       }
 
-      if (ch[6] <= 2000 && ch[6] >= 1000) {
-        if (ch[6] > 1200) {
-          speed_setting = 505;
-        } else {
-          speed_setting = 600;
-        }
-      }
+ 
 
       if (ch[7] <= 2000 && ch[7] >= 1000) {
         if (ch[7] == 1000) {
-          bot_direction = 0;
+          bot_direction = 25 * yaw;
           no_360 = false;  // 912
                            // 912
         } else if (ch[7] == 1500) {
@@ -71,26 +65,24 @@ void ibus_loop() {
         }
       }
 
-      if (ch[6] <= 2000 && ch[6] >= 1000) {
-        if (ch[6] > 1200) {
-          speed_setting = 505;
-        } else {
-          speed_setting = 600;
-        }
-      }
+
 
 
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
       }
-      if (abs(bot_direction) + abs(bot_speed) > 0) {
-        bot_mode = "RUNNING";
-      } else {
-        bot_mode = "IDLE";
-      }
+      bot_mode = "RUNNING";
+      // if (abs(bot_direction) + abs(bot_speed) > 0) {
+      //   bot_mode = "RUNNING";
+      // } else {
+      //   bot_mode = "IDLE";
+      // }
+
+
     } else {
       bot_mode = "OFF";
       bot_speed = 0;
+      bot_direction = 0;
     }
   }
 
@@ -99,5 +91,9 @@ void ibus_loop() {
     bot_direction = 0;
     bot_mode = "RC_ERROR";
     // Call blinking with red color (255, 0, 0)
+  }  if (ch[6] <= 2000 && ch[6] >= 1000) {
+    if (ch[6] > 1200) {
+      bot_mode = "LIGHT_OFF";
+    }
   }
 }

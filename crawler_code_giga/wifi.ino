@@ -70,6 +70,9 @@ HotspotCredentials check_hotspot(String preferred_ssid = "Anil") {
 
 void connectToWiFi() {
   Serial.print("Connecting to WiFi...");
+  connecting_to_wifi();
+  wifi_connected = false;
+
   HotspotCredentials creds = check_hotspot();
 
   if (creds.ssid != "") {
@@ -78,23 +81,30 @@ void connectToWiFi() {
     long int wait_time = millis();
 
     WiFi.begin(creds.ssid.c_str(), creds.password.c_str());
-    
-    while (WiFi.status() != WL_CONNECTED) {
+
+    while (WiFi.status() != WL_CONNECTED && (millis() - wait_time) < 5000) {
       Serial.print(".");
-      if ((millis() - wait_time) > 2000) {  // Timeout after 20 seconds
-        Serial.println("\nCould not connect to WiFi!");
-        wifi_connected = false;
-        return;
-      }
     }
-    wifi_connected = true;
-    Serial.println("\nConnected to WiFi!");
+    if (WiFi.status() == WL_CONNECTED) {
+
+      connected();
+      wifi_connected = true;
+      Serial.println("\nConnected to WiFi!");
+    } else {
+      not_connected();
+
+      Serial.println("Timeout .");
+    }
   }
 
   // Connect using creds.ssid and creds.password
   else {
+    not_connected();
+
     Serial.println("No matching hotspot found.");
   }
+  delay(1000);
+  default_text();
 
 }
 
@@ -140,14 +150,11 @@ void updateData() {
   if (wifi_connected == true) {
     unsigned long startTime = millis();
 
+
     if (WiFi.status() != WL_CONNECTED) {
-      Serial.println("WiFi Disconnected. Reconnecting...");
-      //connectToWiFi();
-      if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Failed to reconnect to WiFi. Data update aborted.");
-        wifi_connected = false;
-        return;
-      }
+      Serial.println("Failed to reconnect to WiFi. Data update aborted.");
+      wifi_connected = false;
+      return;
     }
     // Serial.println("Time Taken to check and connect Wifi");
     // Serial.println(millis() - startTime);
@@ -189,8 +196,8 @@ void updateData() {
     bool successObtained = false;
     String response = "";  // Buffer to store incoming data
 
-    while (client.connected() && (millis() - startTime < 1000)) {  // Timeout after 2 seconds
-      while (client.available()) {                                 // Check if data is available to read
+    while (client.connected() && (millis() - startTime < 4000)) {  // Timeout after 2 seconds
+      while (client.available() && (millis() - startTime < 4000)) {                                 // Check if data is available to read
         char c = client.read();                                    // Read one byte at a time
         response += c;                                             // Append byte to the response buffer
         // Serial.print(c);                                           // Print each character for debugging
@@ -199,26 +206,25 @@ void updateData() {
         if (response.indexOf("{\"success\":true}") != -1) {
           successObtained = true;
           break;  // Exit inner loop if the response is found
-        }
+        }  
+      move_bot();
+
       }
 
       // Break outer loop if the response is found
       if (successObtained) {
         break;
       }
-
-      // Allow other tasks to run (important in embedded systems)
       move_bot();
-;
+      
     }
 
     // Print final status
     if (successObtained) {
       Serial.println("\nSuccess response obtained.");
     } else {
-      Serial.println("\nTimeout or different response received.");     
-     wifi_connected = false;
-
+      Serial.println("\nTimeout or different response received.");
+      wifi_connected = false;
     }
 
     // Serial.println("Time Taken to obtain response");
