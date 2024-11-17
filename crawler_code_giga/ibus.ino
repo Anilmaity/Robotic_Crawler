@@ -7,6 +7,7 @@ iBus receiver(Serial4, MAX_CHANNELS);  // Serial2 pins in arduino giga
 void ibus_setup() {
   receiver.begin();
 }
+
 void inspection_mode_setting() {
   if (inspection_mode == true) {
 
@@ -32,17 +33,10 @@ void ibus_loop() {
     if (value >= 1000 && value <= 2000) {
       ch[i] = value;
     }
+
     if (ch[10] > 1000) {
-      if (rc_connected != true) {
-
-        default_text();
-      }
       rc_connected = true;  // 912
-
     } else {
-      if (rc_connected != false) {
-        text_display("RC ERROR");
-      }
       rc_connected = false;
     }
 
@@ -50,26 +44,23 @@ void ibus_loop() {
       connectToWiFi();  // 912
       ch[8] = 1500;
     }
+
   }
+
   if (ch[10] > 1900 && inspection_mode != true) {
     inspection_mode = true;  // 912
-    inspection_text();
   } else if (ch[10] < 1100 && inspection_mode != false) {
     inspection_mode = false;  // 912
-    default_text();
   }
 
 
   inspection_mode_setting();
-  if (rc_connected == true && inspection_mode == false) {
 
-    //Serial.println(receiver.get(0));  // received packet quality. If 0 -> there are some corrupted values
+  if (rc_connected == true && inspection_mode == false) {
 
     if (ch[5] >= 1200) {
       if (ch[3] <= 2000 && ch[3] >= 1000) {
-
         bot_speed = map(ch[3], 1000, 2000, 500, -500);
-
       } else {
         bot_speed = 0;
       }
@@ -77,8 +68,6 @@ void ibus_loop() {
 
       if (ch[1] <= 2000 && ch[1] >= 1000) {
         bot_direction = map(ch[1], 1000, 2000, -500, 500);  // 912
-
-
       } else {
         bot_direction = 0;  // 912
       }
@@ -103,18 +92,15 @@ void ibus_loop() {
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
       }
-      bot_mode = "RUNNING";
-      // if (abs(bot_direction) + abs(bot_speed) > 0) {
-      //   bot_mode = "RUNNING";
-      // } else {
-      //   bot_mode = "IDLE";
-      // }
+
+      if (abs(bot_direction) + abs(bot_speed) > 0) {
+        bot_mode = "RUNNING";
+      } else {
+        bot_mode = "IDLE";
+      }
 
 
     } else {
-      if (bot_mode != "OFF") {
-        text_display("EMERGENCY");
-      }
       bot_mode = "OFF";
       bot_speed = 0;
       bot_direction = 0;
