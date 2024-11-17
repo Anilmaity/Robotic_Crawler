@@ -36,6 +36,28 @@ void default_text() {
   oled.setTextXY(4, 1);
   oled.putString("Inspectobot,");
 }
+
+void inspection_text() {
+  oled.clearDisplay();
+  oled.setTextXY(2, 1);
+  oled.putString("Inspec Mode");
+}
+void inspection_text_update() {
+  oled.setTextXY(4, 1);
+  oled.putString(inspection_request_mode);
+}
+void text_ok() {
+  oled.clearDisplay();
+  oled.setTextXY(2, 1);
+  oled.putString("OK");
+  oled.setTextXY(4, 1);
+  oled.putString("     ");
+}
+void text_display(String value) {
+  oled.clearDisplay();
+  oled.setTextXY(2, 1);
+  oled.putString(value);
+}
 void clear_display() {
   oled.clearDisplay();
 }

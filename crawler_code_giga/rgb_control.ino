@@ -1,17 +1,22 @@
 
 
 #define PIN 2  // On Trinket or Gemma, suggest changing this to 1
+#define PIN2 5 // On Trinket or Gemma, suggest changing this to 1
+#define NUMPIXELS2 32  // Popular NeoPixel ring size
 
 #define NUMPIXELS 48  // Popular NeoPixel ring size
 int max_brightness = 255;
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels2(NUMPIXELS, PIN2, NEO_GRB + NEO_KHZ800);
 
 long int led_time = millis();
 
 void leds_setup() {
   pixels.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
   off();
+  pixels2.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
+
 }
 
 void green() {
@@ -20,13 +25,23 @@ void green() {
     pixels.setPixelColor(i, pixels.Color(0, 200, 0));
     pixels.show();
   }
+  for (int i = 0; i < NUMPIXELS2; i++) {
+    pixels2.setPixelColor(i, pixels2.Color(0, 200, 0));
+    pixels2.show();
+  }
 }
 
-void red() {  pixels.clear();
+void red() {  
+  pixels.clear();
+  pixels2.clear();
 
   for (int i = 0; i < NUMPIXELS; i++) {
     pixels.setPixelColor(i, pixels.Color(200, 0, 0));
     pixels.show();  // Send the updated pixel colors to the hardware.
+  }
+  for (int i = 0; i < NUMPIXELS2; i++) {
+    pixels2.setPixelColor(i, pixels2.Color(200, 0, 0));
+    pixels2.show();
   }
 }
 
@@ -35,6 +50,10 @@ void white() {
   for (int i = 0; i < NUMPIXELS; i++) {  // For each pixel...
     pixels.setPixelColor(i, pixels.Color(200, 200, 200));
     pixels.show();  // Send the updated pixel colors to the hardware.
+  }
+  for (int i = 0; i < NUMPIXELS2; i++) {  // For each pixel...
+    pixels2.setPixelColor(i, pixels2.Color(200, 200, 200));
+    pixels2.show();  // Send the updated pixel colors to the hardware.
   }
 }
 
@@ -45,13 +64,22 @@ void blue() {
     pixels.setPixelColor(i, pixels.Color(0, 0, 200));
     pixels.show();  // Send the updated pixel colors to the hardware.
   }
+  for (int i = 0; i < NUMPIXELS; i++) {
+    pixels2.setPixelColor(i, pixels2.Color(0, 0, 200));
+    pixels2.show();  // Send the updated pixel colors to the hardware.
+  }
 }
 
 void off() {
   pixels.clear();
+  pixels2.clear();
   for (int i = 0; i < NUMPIXELS; i++) {
     pixels.setPixelColor(i, pixels.Color(0, 0, 0));
     pixels.show();  // Send the updated pixel colors to the hardware.
+  }
+  for (int i = 0; i < NUMPIXELS; i++) {
+    pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
+    pixels2.show();  // Send the updated pixel colors to the hardware.
   }
 }
 

@@ -7,6 +7,23 @@ iBus receiver(Serial4, MAX_CHANNELS);  // Serial2 pins in arduino giga
 void ibus_setup() {
   receiver.begin();
 }
+void inspection_mode_setting() {
+  if (inspection_mode == true) {
+
+    if (ch[7] == 1000) {
+      inspection_request_mode = "New Inspec";
+    } else if (ch[7] == 1500) {
+      inspection_request_mode = "Map Inspec";
+    } else if (ch[7] == 2000) {
+      inspection_request_mode = "Saved Inspec";
+    }
+
+    if (ch[9] == 2000) {
+      text_ok();
+    }
+  }
+}
+
 
 void ibus_loop() {
   receiver.process();
@@ -16,8 +33,16 @@ void ibus_loop() {
       ch[i] = value;
     }
     if (ch[10] > 1000) {
+      if (rc_connected != true) {
+
+        default_text();
+      }
       rc_connected = true;  // 912
+
     } else {
+      if (rc_connected != false) {
+        text_display("RC ERROR");
+      }
       rc_connected = false;
     }
 
@@ -26,8 +51,17 @@ void ibus_loop() {
       ch[8] = 1500;
     }
   }
+  if (ch[10] > 1900 && inspection_mode != true) {
+    inspection_mode = true;  // 912
+    inspection_text();
+  } else if (ch[10] < 1100 && inspection_mode != false) {
+    inspection_mode = false;  // 912
+    default_text();
+  }
 
-  if (rc_connected == true) {
+
+  inspection_mode_setting();
+  if (rc_connected == true && inspection_mode == false) {
 
     //Serial.println(receiver.get(0));  // received packet quality. If 0 -> there are some corrupted values
 
@@ -49,7 +83,7 @@ void ibus_loop() {
         bot_direction = 0;  // 912
       }
 
- 
+
 
       if (ch[7] <= 2000 && ch[7] >= 1000) {
         if (ch[7] == 1000) {
@@ -66,8 +100,6 @@ void ibus_loop() {
       }
 
 
-
-
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
       }
@@ -80,18 +112,23 @@ void ibus_loop() {
 
 
     } else {
+      if (bot_mode != "OFF") {
+        text_display("EMERGENCY");
+      }
       bot_mode = "OFF";
       bot_speed = 0;
       bot_direction = 0;
     }
   }
 
-  else {
+  else if(inspection_mode == false) {
+
     bot_speed = 0;
     bot_direction = 0;
     bot_mode = "RC_ERROR";
     // Call blinking with red color (255, 0, 0)
-  }  if (ch[6] <= 2000 && ch[6] >= 1000) {
+  }
+  if (ch[6] <= 2000 && ch[6] >= 1000) {
     if (ch[6] > 1200) {
       bot_mode = "LIGHT_OFF";
     }
