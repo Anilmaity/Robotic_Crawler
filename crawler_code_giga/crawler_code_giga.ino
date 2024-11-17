@@ -45,8 +45,8 @@ int left_stepper_pin[3] = { 9, 35, 52 };
 int m1 = 0;
 int m2 = 0;
 int speed_setting = 700;
-int motor1_speed = 0;
-int motor2_speed = 0;
+float motor1_speed = 0;
+float motor2_speed = 0;
 int bot_speed = 0;
 int bot_direction = 0;
 

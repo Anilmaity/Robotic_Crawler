@@ -60,14 +60,14 @@ void ibus_loop() {
 
     if (ch[5] >= 1200) {
       if (ch[3] <= 2000 && ch[3] >= 1000) {
-        bot_speed = map(ch[3], 1000, 2000, 500, -500);
+        bot_speed = map(ch[3], 1000, 2000, 1000, -1000);
       } else {
         bot_speed = 0;
       }
 
 
-      if (ch[1] <= 2000 && ch[1] >= 1000) {
-        bot_direction = map(ch[1], 1000, 2000, -500, 500);  // 912
+      if (ch[1] <= 2000 && ch[1] >= 1000 && (ch[1] <= 1495 || ch[1] >= 1505)) {
+        bot_direction = map(ch[1], 1000, 2000, -1000, 1000);  // 912
       } else {
         bot_direction = 0;  // 912
       }
