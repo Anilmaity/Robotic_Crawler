@@ -20,7 +20,7 @@ void inspection_mode_setting() {
     }
 
     if (ch[9] == 2000) {
-      text_ok();
+      //text_ok();
     }
   }
 }
@@ -76,14 +76,20 @@ void ibus_loop() {
 
       if (ch[7] <= 2000 && ch[7] >= 1000) {
         if (ch[7] == 1000) {
-          bot_direction = 25 * yaw;
+          auto_pitch = true;
+          bot_direction = 0;
           no_360 = false;  // 912
                            // 912
         } else if (ch[7] == 1500) {
           no_360 = true;  // 912
+          auto_pitch = false;
+
         } else if (ch[7] == 2000) {
           bot_direction = bot_direction;  // 912
           no_360 = false;
+          auto_pitch = false;
+
+
           // 912
         }
       }
@@ -114,9 +120,10 @@ void ibus_loop() {
     bot_mode = "RC_ERROR";
     // Call blinking with red color (255, 0, 0)
   }
-  if (ch[6] <= 2000 && ch[6] >= 1000) {
-    if (ch[6] > 1200) {
-      bot_mode = "LIGHT_OFF";
-    }
-  }
+
+  // if (ch[6] <= 2000 && ch[6] >= 1000) {
+  //   if (ch[6] > 1200) {
+  //     bot_mode = "LIGHT_OFF";
+  //   }
+  // }
 }

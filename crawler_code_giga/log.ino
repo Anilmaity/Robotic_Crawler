@@ -15,11 +15,11 @@ void serial_logs() {
   Serial.print(ch[9]);
   Serial.print(" ");
   Serial.print(ch[10]);
-  // Serial.print(" ");
-  // Serial.print(bot_speed);
-  // Serial.print(" ");
-  // Serial.print(bot_direction);
-  // Serial.print(" ");
+  Serial.print(" ");
+  Serial.print(bot_speed);
+  Serial.print(" ");
+  Serial.print(bot_direction);
+  Serial.print(" ");
   Serial.print(motor1_speed);
   Serial.print(" ");
   Serial.print(motor2_speed);

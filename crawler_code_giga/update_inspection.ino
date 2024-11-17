@@ -1,11 +1,8 @@
 
 
-// Example sensor data (replace these with actual sensor readings)
-const char* id = "96f63888-16c6-4dc5-a2ac-d5ff3e8f3117";
-
 
 // Function to create the HTTP POST payload dynamically
-String createinspectionPayload() {
+String createinspectiondataPayload() {
   rssi = WiFi.RSSI();
   String payload = "";
   payload += "id=" + String(id);
@@ -17,7 +14,7 @@ String createinspectionPayload() {
   return payload;
 }
 
-void createinspection() {
+void updateinspection() {
   if (wifi_connected == true) {
     unsigned long startTime = millis();
 
@@ -43,7 +40,7 @@ void createinspection() {
 
 
     // Generate data payload dynamically
-    String httpRequestData = createinspectionPayload();
+    String httpRequestData = createinspectiondataPayload();
 
     String httpRequest = "POST /updateinspection HTTP/1.1\r\n";
     httpRequest += "Host: " + String(serverName) + "\r\n";

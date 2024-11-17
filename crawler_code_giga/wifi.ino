@@ -10,13 +10,10 @@ const char* password2 = "9925512860";
 const char* ssid3 = "Anmol's Iphone 2";
 const char* password3 = "Anmolshah";
 
-const char* serverName = "arnobot.live";  // Domain of your HTTP server
-const int serverPort = 80;                // HTTP port
+            // HTTP port
 
-WiFiClient client;  // Use WiFiClient for HTTP
 
 // Example sensor data (replace these with actual sensor readings)
-const char* id = "96f63888-16c6-4dc5-a2ac-d5ff3e8f3117";
 int power = 100;
 int active_sensors = 5;
 int total_sensors = 5;
