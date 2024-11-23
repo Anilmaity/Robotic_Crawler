@@ -16,9 +16,9 @@ void auto_correct() {
   float error_value = -(target_pitch_angle - pitch);
   if (auto_pitch == true) {
    
-   i_error += error_value * 0.0001;
-   d_error = (previous_error - error_value)*10;
-   p_error = error_value * 25;
+   i_error += error_value * 0.0003;
+   d_error = (previous_error - error_value)*15;
+   p_error = error_value * 35;
    error_direction = p_error + d_error + i_error;
    previous_error = error_value;
    
