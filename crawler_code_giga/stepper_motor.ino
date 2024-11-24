@@ -13,9 +13,24 @@ void stepper_setup() {
 
 
 void auto_correct() {
-  float error_value = -(target_pitch_angle - pitch);
   if (auto_pitch == true) {
+     float error_value = -(target_pitch_angle - pitch);
+
+   i_error += error_value * 0.0003;
+   d_error = (previous_error - error_value)*15;
+   p_error = error_value * 35;
+   error_direction = p_error + d_error + i_error;
+   previous_error = error_value;
    
+  } else {
+    error_direction = 0;
+    i_error =0;
+    previous_error = 0;
+  }
+
+  if (auto_yaw == true) {
+     float error_value = -(target_yaw_angle - yaw);
+
    i_error += error_value * 0.0003;
    d_error = (previous_error - error_value)*15;
    p_error = error_value * 35;

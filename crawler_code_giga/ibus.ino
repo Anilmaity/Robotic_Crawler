@@ -10,19 +10,56 @@ void ibus_setup() {
 
 void inspection_mode_setting() {
   if (inspection_mode == true) {
+    if (ch[6] == 1000) {
+      setting_mode = "WIFI";
+    } else if (ch[6] == 1500) {
+      setting_mode = "ANGLE";
+    } else if (ch[6] == 2000) {
+      setting_mode = "INSPECTION";
+    }
 
     if (ch[7] == 1000) {
-      inspection_request_mode = "New Inspec";
-    } else if (ch[7] == 1500) {
-      inspection_request_mode = "Map Inspec";
-    } else if (ch[7] == 2000) {
-      inspection_request_mode = "Saved Inspec";
+      if (setting_mode == "WIFI") {
+        inspection_request_mode = "CONNECT";
+      } else if (setting_mode == "ANGLE") {
+        inspection_request_mode = "RESET PITCH";
+      } else if (setting_mode == "INSPECTION") {
+        inspection_request_mode = "NEW INSPEC";
+      }
+    }
+ 
+    else if (ch[7] == 1500) {
+      if (setting_mode == "WIFI") {
+        inspection_request_mode = "ON";
+      } else if (setting_mode == "ANGLE") {
+        inspection_request_mode = "RESET YAW";
+      } else if (setting_mode == "INSPECTION") {
+        inspection_request_mode = "END Inspec";
+      }
     }
 
+    else if (ch[7] == 2000) {
+      if (setting_mode == "WIFI") {
+        inspection_request_mode = "OFF";
+      } else if (setting_mode == "ANGLE") {
+        inspection_request_mode = "RESET ENCODER";
+      } else if (setting_mode == "INSPECTION") {
+        inspection_request_mode = "RESET Inspec";
+      }    }
+
     if (ch[9] == 2000) {
-      //text_ok();
-    }
+      if (setting_mode == "WIFI" && inspection_request_mode == "CONNECT") {connectToWiFi(); }
+      else if (setting_mode == "WIFI" && inspection_request_mode == "ON") {connectToWiFi();}
+      else if (setting_mode == "WIFI" && inspection_request_mode == "OFF") {connectToWiFi();}
+      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET PITCH") {connectToWiFi();}
+      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET ENCODER") {connectToWiFi();}
+      else if (setting_mode == "ANGLE" && inspection_request_mode == "OFF") {connectToWiFi();}
+      else if (setting_mode == "INSPECTION" && inspection_request_mode == "NEW INSPEC") {connectToWiFi();}
+      else if (setting_mode == "INSPECTION" && inspection_request_mode == "END INSPEC") {connectToWiFi();}
+      else if (setting_mode == "INSPECTION" && inspection_request_mode == "RESET INSPEC") {connectToWiFi();}
+
   }
+}
 }
 
 
@@ -40,21 +77,19 @@ void ibus_loop() {
       rc_connected = false;
     }
 
-    if (ch[8] == 2000 && wifi_connected == false) {
-      connectToWiFi();  // 912
-      ch[8] = 1500;
-    }
-
+    // if (ch[8] == 2000 && wifi_connected == false) {
+    //   connectToWiFi();  // 912
+    //   ch[8] = 1500;
+    // }
   }
 
-  if (ch[10] > 1900 && inspection_mode != true) {
+  if (ch[8] > 1900 && inspection_mode != true) {
     inspection_mode = true;  // 912
-  } else if (ch[10] < 1100 && inspection_mode != false) {
+  } else if (ch[8] < 1100 && inspection_mode != false) {
     inspection_mode = false;  // 912
   }
 
 
-  inspection_mode_setting();
 
   if (rc_connected == true && inspection_mode == false) {
 
@@ -72,28 +107,42 @@ void ibus_loop() {
         bot_direction = 0;  // 912
       }
 
+      if (ch[6] == 1500) {
+        auto_pitch = true;
+        auto_yaw = false;
 
+      } else if (ch[6] == 2000) {
+        auto_yaw = true;
+        auto_pitch = false;
+
+      } else if (ch[6] == 2000) {
+        auto_yaw = false;
+        auto_pitch = false;
+      }
 
       if (ch[7] <= 2000 && ch[7] >= 1000) {
         if (ch[7] == 1000) {
-          auto_pitch = true;
+
           bot_direction = 0;
           no_360 = false;  // 912
                            // 912
         } else if (ch[7] == 1500) {
           no_360 = true;  // 912
           auto_pitch = false;
+          auto_yaw = false;
 
         } else if (ch[7] == 2000) {
           bot_direction = bot_direction;  // 912
           no_360 = false;
           auto_pitch = false;
+          auto_yaw = false;
 
 
           // 912
         }
       }
-
+      if (ch[6] <= 2000 && ch[6] >= 1000) {
+      }
 
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
@@ -113,17 +162,13 @@ void ibus_loop() {
     }
   }
 
-  else if(inspection_mode == false) {
+  else if (inspection_mode == false) {
 
     bot_speed = 0;
     bot_direction = 0;
     bot_mode = "RC_ERROR";
     // Call blinking with red color (255, 0, 0)
+  } else {
+    inspection_mode_setting();
   }
-
-  // if (ch[6] <= 2000 && ch[6] >= 1000) {
-  //   if (ch[6] > 1200) {
-  //     bot_mode = "LIGHT_OFF";
-  //   }
-  // }
 }

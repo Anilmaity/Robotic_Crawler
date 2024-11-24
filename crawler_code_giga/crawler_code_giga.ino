@@ -66,11 +66,14 @@ double d_error = 0;
 double previous_error = 0;
 bool auto_pitch = false;
 bool target_pitch_angle = 0;
+bool target_yaw_angle = 0;
+
 // Variables for Bot State
 bool rc_connected = false;
 String inspection_request_mode = "New Inspection";
 String bot_mode = "OFF";
 String previous_bot_mode = "IDLE";
+String setting_mode = "";
 bool wifi_connected = true;
 long rssi = 0;  // Get the RSSI value
 
@@ -81,7 +84,7 @@ float current_value = 0;
 // Variable for Turning off Features
 bool turn_off_wifi_update = true;
 bool turn_off_imu_update = false;
-bool turn_off_oled_update = true;
+bool turn_off_oled_update = false;
 bool turn_off_current_update = true;
 bool turn_off_stepper_update = false;
 bool turn_off_encoder_update = false;
@@ -133,8 +136,8 @@ void loop() {
 
 
   if (turn_off_oled_update == false) {
-    inspection_text_update();
-    if (inspection_mode == true && (millis() - oled_update) > 100) {
+    text_update();
+    if ((millis() - oled_update) > 100) {
       oled_update = millis();
     }
   }
