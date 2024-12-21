@@ -38,8 +38,8 @@ long int total_steps = 0;
 bool no_360 = true;
 
 // Variables for STEPPER PINS
-int right_stepper_pin[3] = { 8, 25, 50 };  // pulse, dir , en
-int left_stepper_pin[3] = { 9, 35, 52 };
+int right_stepper_pin[3] = { 5, 4, 50 };  // pulse, dir , en
+int left_stepper_pin[3] = { 3, 2, 52 };
 
 // Variables for Bot Control
 int m1 = 0;
@@ -88,7 +88,7 @@ bool turn_off_oled_update = false;
 bool turn_off_current_update = true;
 bool turn_off_stepper_update = false;
 bool turn_off_encoder_update = false;
-bool turn_off_rgb_lights = true;
+bool turn_off_rgb_lights = false;
 bool turn_off_serial_logs = false;
 
 // Variable for Encoder
@@ -104,7 +104,6 @@ long int loop_time = 0;
 
 void setup() {
   leds_setup();
-  //red();
   if (turn_off_oled_update == false) { oled_setup(); }
 
   // put your setp code here, to run once:
@@ -118,7 +117,6 @@ void setup() {
   update_data = millis();
   if (turn_off_wifi_update == false) { connectToWiFi(); }
 
-  //white();
 }
 
 
@@ -126,19 +124,22 @@ void setup() {
 void loop() {
   loop_time = millis() - loopstart;
   loopstart = millis();
+
   move_bot();
 
-  if (millis() - imu_start > 25) {
+  if (millis() - imu_start > 50) {
     if (turn_off_imu_update == false) { imu(); }
     imu_start = millis();
-    if (turn_off_serial_logs == false) { serial_logs(); }
-  }
+    if (turn_off_serial_logs == false) { serial_logs();}
+}
 
 
   if (turn_off_oled_update == false) {
     text_update();
+
     if ((millis() - oled_update) > 100) {
       oled_update = millis();
+
     }
   }
 
@@ -146,11 +147,12 @@ void loop() {
   if (turn_off_rgb_lights == false) { led_control(); }
 
   if (millis() - update_data > 3000) {
-    //if (turn_off_serial_logs == false) { serial_logs();}
     if (turn_off_wifi_update == false) { updateData(); }
     if (turn_off_current_update == false) { current_reading(); }
 
     //Serial.println(millis() - update_data);
     update_data = millis();
   }
+
+
 }

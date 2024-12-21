@@ -7,8 +7,8 @@ String mode_text = "";
 String previous_mode_text = "";
 
 void oled_setup() {
-  Wire1.begin();
-  oled.init(Wire1);
+  Wire.begin();
+  oled.init(Wire);
   oled.clearDisplay();
 }
 

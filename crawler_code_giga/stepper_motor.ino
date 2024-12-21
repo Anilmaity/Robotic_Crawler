@@ -33,7 +33,7 @@ void auto_correct() {
 
    i_error += error_value * 0.0003;
    d_error = (previous_error - error_value)*15;
-   p_error = error_value * 35;
+   p_error = error_value * 20;
    error_direction = p_error + d_error + i_error;
    previous_error = error_value;
    
@@ -55,8 +55,8 @@ void move_bot() {
   motor2_speed = constrain(motor2_speed, -500, 500);
 
   // Calculate the number of loops based on the speed (10 loops at speed 500)
-  int motor1_loops = map(abs(motor1_speed), 0, 500, 0, 10);  // 0 to 10 loops for motor 1
-  int motor2_loops = map(abs(motor2_speed), 0, 500, 0, 10);  // 0 to 10 loops for motor 2
+  int motor1_loops = map(abs(motor1_speed), 0, 500, 0, 20);  // 0 to 10 loops for motor 1
+  int motor2_loops = map(abs(motor2_speed), 0, 500, 0, 20);  // 0 to 10 loops for motor 2
   
   
   // Determine the maximum number of loops needed
@@ -67,7 +67,7 @@ void move_bot() {
     // Handle motor 1 direction and stepping if it still needs more loops
     if (i < motor1_loops) {
       // Apply no_360 logic: stop motor1 if motor2 is moving too fast in the opposite direction
-      if (no_360 && motor2_speed < 0 && motor1_speed > 0) {
+      if (no_360 && motor2_speed > 0 && motor1_speed < 0) {
         motor1_speed = 0;
       }
 
@@ -89,7 +89,7 @@ void move_bot() {
     // Handle motor 2 direction and stepping if it still needs more loops
     if (i < motor2_loops) {
       // Apply no_360 logic: stop motor2 if motor1 is moving too fast in the opposite direction
-      if (no_360 && motor1_speed < 0 && motor2_speed > 0) {
+      if (no_360 && motor1_speed > 0 && motor2_speed < 0) {
         motor2_speed = 0;
       }
 

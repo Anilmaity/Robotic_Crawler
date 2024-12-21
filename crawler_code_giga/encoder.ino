@@ -1,5 +1,5 @@
-#define ENC_A  51  // Example pin number for encoder pin A (must be interrupt capable)
-#define ENC_B  53  // Example pin number for encoder pin B
+#define ENC_A  38  // Example pin number for encoder pin A (must be interrupt capable)
+#define ENC_B  40  // Example pin number for encoder pin B
 
 volatile int last_encA_state = LOW;
 

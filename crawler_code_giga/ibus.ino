@@ -49,14 +49,14 @@ void inspection_mode_setting() {
 
     if (ch[9] == 2000) {
       if (setting_mode == "WIFI" && inspection_request_mode == "CONNECT") {connectToWiFi(); }
-      else if (setting_mode == "WIFI" && inspection_request_mode == "ON") {connectToWiFi();}
-      else if (setting_mode == "WIFI" && inspection_request_mode == "OFF") {connectToWiFi();}
-      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET PITCH") {connectToWiFi();}
-      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET ENCODER") {connectToWiFi();}
-      else if (setting_mode == "ANGLE" && inspection_request_mode == "OFF") {connectToWiFi();}
-      else if (setting_mode == "INSPECTION" && inspection_request_mode == "NEW INSPEC") {connectToWiFi();}
-      else if (setting_mode == "INSPECTION" && inspection_request_mode == "END INSPEC") {connectToWiFi();}
-      else if (setting_mode == "INSPECTION" && inspection_request_mode == "RESET INSPEC") {connectToWiFi();}
+      else if (setting_mode == "WIFI" && inspection_request_mode == "ON") {turn_off_wifi_update = false; text_ok();}
+      else if (setting_mode == "WIFI" && inspection_request_mode == "OFF") {turn_off_wifi_update = true; text_ok();}
+      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET PITCH") {target_pitch_angle = pitch; text_ok();}
+      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET ENCODER") {target_yaw_angle = yaw; text_ok();}
+      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET ENCODER") {distance_travel =0; text_ok();}
+      else if (setting_mode == "INSPECTION" && inspection_request_mode == "NEW INSPEC") {Serial.print(inspection_request_mode); text_ok();}
+      else if (setting_mode == "INSPECTION" && inspection_request_mode == "END INSPEC") {Serial.print(inspection_request_mode); text_ok();}
+      else if (setting_mode == "INSPECTION" && inspection_request_mode == "RESET INSPEC") {Serial.print(inspection_request_mode); text_ok();}
 
   }
 }
@@ -148,10 +148,10 @@ void ibus_loop() {
         encoder_value = 0;  // 912
       }
 
-      if (abs(bot_direction) + abs(bot_speed) > 0) {
+      if (abs(bot_direction) + abs(bot_speed) > 5) {
         bot_mode = "RUNNING";
       } else {
-        bot_mode = "IDLE";
+        bot_mode = "RUNNING";
       }
 
 
