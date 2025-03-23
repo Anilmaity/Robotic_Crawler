@@ -2,11 +2,11 @@ int min_speed = 5;
 
 void stepper_setup() {
 
-  pinMode(right_stepper_pin[0], OUTPUT);
+  //pinMode(right_stepper_pin[0], OUTPUT);
   pinMode(right_stepper_pin[1], OUTPUT);
   pinMode(right_stepper_pin[2], OUTPUT);
 
-  pinMode(left_stepper_pin[0], OUTPUT);
+  //pinMode(left_stepper_pin[0], OUTPUT);
   pinMode(left_stepper_pin[1], OUTPUT);
   pinMode(left_stepper_pin[2], OUTPUT);
 }

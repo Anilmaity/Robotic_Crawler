@@ -28,7 +28,7 @@ void extractData(String data) {
   int bufferIndex = 0;
 
   for (int i = 0; i < data.length(); i++) {
-    if (data[i] == ' ' || i == data.length() - 1) {  
+    if (data[i] == ' ' || i == data.length() - 1) {
       if (bufferIndex > 0) {
         buffer[bufferIndex] = '\0';  // Null-terminate string
         if (index < MAX_CHANNELS) {
@@ -82,8 +82,8 @@ void evaluate() {
       }
 
 
-      if (ch[1] <= 2000 && ch[1] >= 1000) {
-        bot_direction = map(ch[1], 1000, 2000, -500, 500);  // 912
+      if (ch[1] <= 2000 && ch[1] >= 1000 && (ch[1] <= 1495 || ch[1] >= 1505)) {
+        bot_direction = map(ch[1], 1000, 2000, -1000, 1000);  // 912
       } else {
         bot_direction = 0;  // 912
       }
@@ -122,7 +122,7 @@ void evaluate() {
           // 912
         }
       }
-  
+
 
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
