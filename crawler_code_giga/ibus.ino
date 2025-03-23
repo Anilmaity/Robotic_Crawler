@@ -1,75 +1,56 @@
-#include <iBus.h>
 
-#define MAX_CHANNELS 10
 
-iBus receiver(Serial4, MAX_CHANNELS);  // Serial2 pins in arduino giga
 
-void ibus_setup() {
-  receiver.begin();
+void serial_setup() {
+  Serial4.begin(115200);
 }
 
-void inspection_mode_setting() {
-  if (inspection_mode == true) {
-    if (ch[6] == 1000) {
-      setting_mode = "WIFI";
-    } else if (ch[6] == 1500) {
-      setting_mode = "ANGLE";
-    } else if (ch[6] == 2000) {
-      setting_mode = "INSPECTION";
+void data_loop() {
+  static String receivedData = "";  // Store received characters
+
+  while (Serial4.available()) {
+    char inChar = Serial4.read();
+
+    if (inChar == '\n') {  // End of message
+      extractData(receivedData);  // Extract and store numbers
+      receivedData = "";  // Clear buffer for next message
+    } else {
+      receivedData += inChar;  // Append character to string
     }
-
-    if (ch[7] == 1000) {
-      if (setting_mode == "WIFI") {
-        inspection_request_mode = "CONNECT";
-      } else if (setting_mode == "ANGLE") {
-        inspection_request_mode = "RESET PITCH";
-      } else if (setting_mode == "INSPECTION") {
-        inspection_request_mode = "NEW INSPEC";
-      }
-    }
- 
-    else if (ch[7] == 1500) {
-      if (setting_mode == "WIFI") {
-        inspection_request_mode = "ON";
-      } else if (setting_mode == "ANGLE") {
-        inspection_request_mode = "RESET YAW";
-      } else if (setting_mode == "INSPECTION") {
-        inspection_request_mode = "END Inspec";
-      }
-    }
-
-    else if (ch[7] == 2000) {
-      if (setting_mode == "WIFI") {
-        inspection_request_mode = "OFF";
-      } else if (setting_mode == "ANGLE") {
-        inspection_request_mode = "RESET ENCODER";
-      } else if (setting_mode == "INSPECTION") {
-        inspection_request_mode = "RESET Inspec";
-      }    }
-
-    if (ch[9] == 2000) {
-      if (setting_mode == "WIFI" && inspection_request_mode == "CONNECT") {connectToWiFi(); }
-      else if (setting_mode == "WIFI" && inspection_request_mode == "ON") {turn_off_wifi_update = false; text_ok();}
-      else if (setting_mode == "WIFI" && inspection_request_mode == "OFF") {turn_off_wifi_update = true; text_ok();}
-      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET PITCH") {target_pitch_angle = pitch; text_ok();}
-      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET ENCODER") {target_yaw_angle = yaw; text_ok();}
-      else if (setting_mode == "ANGLE" && inspection_request_mode == "RESET ENCODER") {distance_travel =0; text_ok();}
-      else if (setting_mode == "INSPECTION" && inspection_request_mode == "NEW INSPEC") {Serial.print(inspection_request_mode); text_ok();}
-      else if (setting_mode == "INSPECTION" && inspection_request_mode == "END INSPEC") {Serial.print(inspection_request_mode); text_ok();}
-      else if (setting_mode == "INSPECTION" && inspection_request_mode == "RESET INSPEC") {Serial.print(inspection_request_mode); text_ok();}
-
   }
-}
+
+  evaluate();
 }
 
+void extractData(String data) {
+  int index = 1;
+  char buffer[10];  // Temporary buffer for number conversion
+  int bufferIndex = 0;
 
-void ibus_loop() {
-  receiver.process();
-  for (byte i = 1; i <= MAX_CHANNELS; i++) {  // get channel values starting from 1
-    int value = receiver.get(i);
-    if (value >= 1000 && value <= 2000) {
-      ch[i] = value;
+  for (int i = 0; i < data.length(); i++) {
+    if (data[i] == ' ' || i == data.length() - 1) {  
+      if (bufferIndex > 0) {
+        buffer[bufferIndex] = '\0';  // Null-terminate string
+        if (index < MAX_CHANNELS) {
+          ch[index++ ] = atoi(buffer);  // Convert string to int
+        }
+        bufferIndex = 0;  // Reset buffer
+      }
+    } else {
+      if (bufferIndex < 5) {  // Ensure buffer does not overflow
+        buffer[bufferIndex++] = data[i];
+      }
     }
+  }
+
+}
+
+  // Debug: Print extracted values
+  // Serial.print("Extracted: ");
+void evaluate() {
+
+  for (byte i = 1; i <= MAX_CHANNELS; i++) {  // get channel values starting from 1
+
 
     if (ch[10] > 1000) {
       rc_connected = true;  // 912
@@ -141,8 +122,7 @@ void ibus_loop() {
           // 912
         }
       }
-      if (ch[6] <= 2000 && ch[6] >= 1000) {
-      }
+  
 
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
@@ -168,7 +148,9 @@ void ibus_loop() {
     bot_direction = 0;
     bot_mode = "RC_ERROR";
     // Call blinking with red color (255, 0, 0)
-  } else {
-    inspection_mode_setting();
   }
 }
+
+
+
+

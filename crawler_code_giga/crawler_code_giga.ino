@@ -10,10 +10,14 @@ const char* serverName = "arnobot.live";  // Domain of your HTTP server
 const int serverPort = 80;
 const char* id = "96f63888-16c6-4dc5-a2ac-d5ff3e8f3117";
 WiFiClient client;  // Use WiFiClient for HTTP
+#define MAX_CHANNELS 10
+
+int ch[MAX_CHANNELS] = {0};  // Array to store extracted values
+static String receivedData = "";  // Store received characters
 
 // Variables for Communication
 int channel_data[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int ch[15];
+
 
 // Variables for Brake Contrl
 // int brake_pin[2] = { 4, 3 };      // pulse, dir , en
@@ -26,7 +30,7 @@ bool lights_on = false;
 
 // Variables for Inspection Mode
 bool inspection_mode = false;
-
+long int inspection_mode_time ;
 // Variables for Auto Yaw
 float target_angle = 0;
 float error_direction = 0;
@@ -50,8 +54,9 @@ float motor2_speed = 0;
 int bot_speed = 0;
 int bot_direction = 0;
 
-
-
+// Variable for rlay
+int relay_pin = 6;
+int relay_value  = 0;
 // Variables for IMU
 float roll = 0;
 float pitch = 0;
@@ -82,9 +87,8 @@ long rssi = 0;  // Get the RSSI value
 float current_value = 0;
 
 // Variable for Turning off Features
-bool turn_off_wifi_update = true;
+bool turn_off_wifi_update = false;
 bool turn_off_imu_update = false;
-bool turn_off_oled_update = false;
 bool turn_off_current_update = true;
 bool turn_off_stepper_update = false;
 bool turn_off_encoder_update = false;
@@ -96,22 +100,20 @@ volatile float distance_travel = 0;
 volatile long int encoder_value = 0;
 
 // Variable for Timers
-long int oled_update = 0;
 long int imu_start;
 long int update_data;
 long int loopstart = 0;
 long int loop_time = 0;
 
 void setup() {
-  leds_setup();
-  if (turn_off_oled_update == false) { oled_setup(); }
+  leds_setup();  
 
   // put your setp code here, to run once:
   Serial.begin(921600);
   Serial2.begin(9600);
   encoder_setup();
   current_setup();
-  ibus_setup();
+  serial_setup();
   stepper_setup();
   imu_start = millis();
   update_data = millis();
@@ -134,14 +136,6 @@ void loop() {
 }
 
 
-  if (turn_off_oled_update == false) {
-    text_update();
-
-    if ((millis() - oled_update) > 100) {
-      oled_update = millis();
-
-    }
-  }
 
 
   if (turn_off_rgb_lights == false) { led_control(); }

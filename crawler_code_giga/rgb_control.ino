@@ -21,11 +21,11 @@ void leds_setup() {
 
 void green() {
   //pixels.clear();
-  off();
+  //off();
   for (int i = start_led; i < NUMPIXELS; i++) {
-    pixels.setPixelColor(i, pixels.Color(0, 200, 0));
-  }    
-  pixels.show();
+    pixels.setPixelColor(i, pixels.Color(0, 255, 0));
+    pixels.show();
+}    
 
   // for (int i = 0; i < NUMPIXELS2; i++) {
   //   pixels2.setPixelColor(i, pixels2.Color(0, 200, 0));
@@ -38,7 +38,7 @@ void red() {
   off();
 
   for (int i = start_led; i < NUMPIXELS; i++) {
-    pixels.setPixelColor(i, pixels.Color(200, 0, 0));
+    pixels.setPixelColor(i, pixels.Color(255, 0, 0));
     pixels.show();  // Send the updated pixel colors to the hardware.
   }
   // for (int i = 0; i < NUMPIXELS2; i++) {
@@ -51,7 +51,7 @@ void white() {
   off();
 
   for (int i = start_led; i < NUMPIXELS; i++) {  // For each pixel...
-    pixels.setPixelColor(i, pixels.Color(200, 200, 200));
+    pixels.setPixelColor(i, pixels.Color(255, 255, 255));
     pixels.show();  // Send the updated pixel colors to the hardware.
   }
   // for (int i = 0; i < NUMPIXELS2; i++) {  // For each pixel...
@@ -65,7 +65,7 @@ void blue() {
 
 
   for (int i = start_led; i < NUMPIXELS; i++) {
-    pixels.setPixelColor(i, pixels.Color(0, 0, 200));
+    pixels.setPixelColor(i, pixels.Color(0, 0, 255));
   }
     pixels.show();  // Send the updated pixel colors to the hardware.
 //   for (int i = 0; i < NUMPIXELS; i++) {
@@ -75,12 +75,12 @@ void blue() {
 }
 
 void off() {
-  //pixels.clear();
+  pixels.clear();
   // pixels2.clear();
   for (int i = 0; i < NUMPIXELS; i++) {
     pixels.setPixelColor(i, pixels.Color(0, 0, 0));
   }
-    pixels.show();  // Send the updated pixel colors to the hardware.
+  //   pixels.show();  // Send the updated pixel colors to the hardware.
   // for (int i = 0; i < NUMPIXELS; i++) {
   //   pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
   //   pixels2.show();  // Send the updated pixel colors to the hardware.
