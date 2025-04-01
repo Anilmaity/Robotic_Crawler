@@ -67,7 +67,6 @@ HotspotCredentials check_hotspot(String preferred_ssid = "Anil") {
 
 void connectToWiFi() {
   Serial.print("Connecting to WiFi...");
-  connecting_to_wifi();
   wifi_connected = false;
 
   HotspotCredentials creds = check_hotspot();
@@ -84,11 +83,9 @@ void connectToWiFi() {
     }
     if (WiFi.status() == WL_CONNECTED) {
 
-      connected();
       wifi_connected = true;
       Serial.println("\nConnected to WiFi!");
     } else {
-      not_connected();
 
       Serial.println("Timeout .");
     }
@@ -96,12 +93,10 @@ void connectToWiFi() {
 
   // Connect using creds.ssid and creds.password
   else {
-    not_connected();
 
     Serial.println("No matching hotspot found.");
   }
   delay(1000);
-  default_text();
 
 }
 
