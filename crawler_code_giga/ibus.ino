@@ -1,56 +1,22 @@
+#include <iBus.h>
 
+#define MAX_CHANNELS 10
 
+iBus receiver(Serial4, MAX_CHANNELS);  // Serial2 pins in arduino giga
 
-void serial_setup() {
-  Serial4.begin(115200);
+void ibus_setup() {
+  receiver.begin();
 }
 
-void data_loop() {
-  static String receivedData = "";  // Store received characters
 
-  while (Serial4.available()) {
-    char inChar = Serial4.read();
 
-    if (inChar == '\n') {  // End of message
-      extractData(receivedData);  // Extract and store numbers
-      receivedData = "";  // Clear buffer for next message
-    } else {
-      receivedData += inChar;  // Append character to string
-    }
-  }
-
-  evaluate();
-}
-
-void extractData(String data) {
-  int index = 1;
-  char buffer[10];  // Temporary buffer for number conversion
-  int bufferIndex = 0;
-
-  for (int i = 0; i < data.length(); i++) {
-    if (data[i] == ' ' || i == data.length() - 1) {
-      if (bufferIndex > 0) {
-        buffer[bufferIndex] = '\0';  // Null-terminate string
-        if (index < MAX_CHANNELS) {
-          ch[index++ ] = atoi(buffer);  // Convert string to int
-        }
-        bufferIndex = 0;  // Reset buffer
-      }
-    } else {
-      if (bufferIndex < 5) {  // Ensure buffer does not overflow
-        buffer[bufferIndex++] = data[i];
-      }
-    }
-  }
-
-}
-
-  // Debug: Print extracted values
-  // Serial.print("Extracted: ");
-void evaluate() {
-
+void ibus_loop() {
+  receiver.process();
   for (byte i = 1; i <= MAX_CHANNELS; i++) {  // get channel values starting from 1
-
+    int value = receiver.get(i);
+    if (value >= 1000 && value <= 2000) {
+      ch[i] = value;
+    }
 
     if (ch[10] > 1000) {
       rc_connected = true;  // 912
@@ -64,10 +30,7 @@ void evaluate() {
           relay_value = 1;
         }
       
-      } // if (ch[8] == 2000 && wifi_connected == false) {
-    //   connectToWiFi();  // 912
-    //   ch[8] = 1500;
-    // }
+      } 
   }
 
   // if (ch[8] > 1900 && inspection_mode != true) {
@@ -88,8 +51,8 @@ void evaluate() {
       }
 
 
-      if (ch[1] <= 2000 && ch[1] >= 1000 && (ch[1] <= 1495 || ch[1] >= 1505)) {
-        bot_direction = map(ch[1], 1000, 2000, -1000, 1000);  // 912
+      if (ch[1] <= 2000 && ch[1] >= 1000) {
+        bot_direction = map(ch[1], 1000, 2000, -500, 500);  // 912
       } else {
         bot_direction = 0;  // 912
       }
@@ -135,9 +98,9 @@ void evaluate() {
       }
 
       if (abs(bot_direction) + abs(bot_speed) > 5) {
-        bot_mode = "RUNNING";
+        bot_mode = "ON";
       } else {
-        bot_mode = "RUNNING";
+        bot_mode = "ON";
       }
 
 
@@ -152,11 +115,7 @@ void evaluate() {
 
     bot_speed = 0;
     bot_direction = 0;
-    bot_mode = "RC_ERROR";
+    bot_mode = "RCER";
     // Call blinking with red color (255, 0, 0)
-  }
+  } 
 }
-
-
-
-

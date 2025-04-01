@@ -5,6 +5,9 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <Adafruit_NeoPixel.h>
+#include "Arduino.h"
+
+
 
 const char* serverName = "arnobot.live";  // Domain of your HTTP server
 const int serverPort = 80;
@@ -59,7 +62,7 @@ int bot_direction = 0;
 
 
 // Variables for IMU
-float roll = 0;
+float roll = -1;
 float pitch = 0;
 float yaw = 0;
 
@@ -98,7 +101,7 @@ bool turn_off_rgb_lights = true;
 bool turn_off_serial_logs = false;
 
 // Variable for Encoder
-volatile float distance_travel = 0;
+volatile float distance_travel = -1;
 volatile long int encoder_value = 0;
 
 // Variable for Timers
@@ -110,7 +113,6 @@ long int loop_time = 0;
 
 void setup() {
   leds_setup();
-  if (turn_off_oled_update == false) { oled_setup(); }
 
   // put your setp code here, to run once:
   Serial.begin(921600);
@@ -139,15 +141,6 @@ void loop() {
     if (turn_off_serial_logs == false) { serial_logs();}
 }
 
-
-  if (turn_off_oled_update == false) {
-    text_update();
-
-    if ((millis() - oled_update) > 100) {
-      oled_update = millis();
-
-    }
-  }
 
 
   if (turn_off_rgb_lights == false) { led_control(); }
