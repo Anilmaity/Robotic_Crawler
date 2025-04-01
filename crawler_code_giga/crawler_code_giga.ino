@@ -24,6 +24,12 @@ int ch[15];
 long int rgb_time = 0;
 bool lights_on = false;
 
+
+int relay_pin1 = 21;
+int relay_pin = 20;
+int relay_value = 0;
+
+
 // Variables for Inspection Mode
 bool inspection_mode = false;
 
@@ -84,11 +90,11 @@ float current_value = 0;
 // Variable for Turning off Features
 bool turn_off_wifi_update = true;
 bool turn_off_imu_update = false;
-bool turn_off_oled_update = false;
+bool turn_off_oled_update = true;
 bool turn_off_current_update = true;
 bool turn_off_stepper_update = false;
 bool turn_off_encoder_update = false;
-bool turn_off_rgb_lights = false;
+bool turn_off_rgb_lights = true;
 bool turn_off_serial_logs = false;
 
 // Variable for Encoder
@@ -116,7 +122,7 @@ void setup() {
   imu_start = millis();
   update_data = millis();
   if (turn_off_wifi_update == false) { connectToWiFi(); }
-
+  light();
 }
 
 
@@ -126,7 +132,7 @@ void loop() {
   loopstart = millis();
 
   move_bot();
-
+  light_operate();
   if (millis() - imu_start > 50) {
     if (turn_off_imu_update == false) { imu(); }
     imu_start = millis();

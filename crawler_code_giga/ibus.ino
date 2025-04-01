@@ -77,17 +77,23 @@ void ibus_loop() {
       rc_connected = false;
     }
 
-    // if (ch[8] == 2000 && wifi_connected == false) {
+    if (ch[8] <= 2000 && ch[8] >= 1000) {
+        if(ch[8] ==1000) {relay_value = 0;}
+        else{
+          relay_value = 1;
+        }
+      
+      } // if (ch[8] == 2000 && wifi_connected == false) {
     //   connectToWiFi();  // 912
     //   ch[8] = 1500;
     // }
   }
 
-  if (ch[8] > 1900 && inspection_mode != true) {
-    inspection_mode = true;  // 912
-  } else if (ch[8] < 1100 && inspection_mode != false) {
-    inspection_mode = false;  // 912
-  }
+  // if (ch[8] > 1900 && inspection_mode != true) {
+  //   inspection_mode = true;  // 912
+  // } else if (ch[8] < 1100 && inspection_mode != false) {
+  //   inspection_mode = false;  // 912
+  // }
 
 
 
@@ -95,7 +101,7 @@ void ibus_loop() {
 
     if (ch[5] >= 1200) {
       if (ch[3] <= 2000 && ch[3] >= 1000) {
-        bot_speed = map(ch[3], 1000, 2000, -500, 500);
+        bot_speed = map(ch[3], 1000, 2000, 500, -500);
       } else {
         bot_speed = 0;
       }
@@ -141,8 +147,7 @@ void ibus_loop() {
           // 912
         }
       }
-      if (ch[6] <= 2000 && ch[6] >= 1000) {
-      }
+
 
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
