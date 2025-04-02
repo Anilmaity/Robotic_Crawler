@@ -67,9 +67,16 @@ void comm_setup() {
 
 
 
-void send_data() {
+void send_data()
+ {
+  int botinfo = 0;
+  if (bot_mode == "OFF") botinfo = 0;
+  else if (bot_mode == "ON") botinfo = 1;
+  else if (bot_mode == "RCER") botinfo = 2;
+  else if (bot_mode == "AT") botinfo = 3;
+  else if (bot_mode == "N") botinfo = 4;
+  else if (bot_mode == "360") botinfo = 5;
   
-
   Serial3.print(" ");
   Serial3.print(roll);
   Serial3.print(" ");
@@ -83,7 +90,7 @@ void send_data() {
   Serial3.print(" ");
   Serial3.print(wifi_connected);
   Serial3.print(" ");
-  Serial3.print(bot_mode);
+  Serial3.print(botinfo);
   Serial3.print(" "); 
   Serial3.println();
 }

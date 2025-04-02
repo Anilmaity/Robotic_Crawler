@@ -72,11 +72,13 @@ void ibus_loop() {
 
       if (ch[7] <= 2000 && ch[7] >= 1000) {
         if (ch[7] == 1000) {
+        bot_mode = "AT";
 
           bot_direction = 0;
           no_360 = false;  // 912
                            // 912
         } else if (ch[7] == 1500) {
+          bot_mode = "N";
           no_360 = true;  // 912
           auto_pitch = false;
           auto_yaw = false;
@@ -86,6 +88,7 @@ void ibus_loop() {
           no_360 = false;
           auto_pitch = false;
           auto_yaw = false;
+          bot_mode = "360";
 
 
           // 912

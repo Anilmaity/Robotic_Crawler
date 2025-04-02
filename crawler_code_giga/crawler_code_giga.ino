@@ -62,7 +62,7 @@ int bot_direction = 0;
 
 
 // Variables for IMU
-float roll = -1;
+float roll = 0;
 float pitch = 0;
 float yaw = 0;
 
@@ -96,12 +96,13 @@ bool turn_off_imu_update = false;
 bool turn_off_oled_update = true;
 bool turn_off_current_update = true;
 bool turn_off_stepper_update = false;
-bool turn_off_encoder_update = false;
+bool turn_off_encoder_update = true;
 bool turn_off_rgb_lights = true;
 bool turn_off_serial_logs = false;
+bool turn_off_serial_data = false;
 
 // Variable for Encoder
-volatile float distance_travel = -1;
+volatile float distance_travel = -1000;
 volatile long int encoder_value = 0;
 
 // Variable for Timers
@@ -112,15 +113,14 @@ long int loopstart = 0;
 long int loop_time = 0;
 
 void setup() {
-  leds_setup();
 
   // put your setp code here, to run once:
   Serial.begin(921600);
   Serial2.begin(9600);
   encoder_setup();
-  current_setup();
   ibus_setup();
   stepper_setup();
+  comm_setup();
   imu_start = millis();
   update_data = millis();
   if (turn_off_wifi_update == false) { connectToWiFi(); }
@@ -133,21 +133,20 @@ void loop() {
   loop_time = millis() - loopstart;
   loopstart = millis();
 
-  move_bot();
+  //move_bot();
   light_operate();
-  if (millis() - imu_start > 50) {
+
+
+if (millis() - imu_start > 50) {
     if (turn_off_imu_update == false) { imu(); }
     imu_start = millis();
     if (turn_off_serial_logs == false) { serial_logs();}
+    if (turn_off_serial_data == false) {   send_data();}
 }
 
 
-
-  if (turn_off_rgb_lights == false) { led_control(); }
-
   if (millis() - update_data > 3000) {
     if (turn_off_wifi_update == false) { updateData(); }
-    if (turn_off_current_update == false) { current_reading(); }
 
     //Serial.println(millis() - update_data);
     update_data = millis();
