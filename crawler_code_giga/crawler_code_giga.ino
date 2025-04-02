@@ -4,7 +4,6 @@
 #include <JY901.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
-#include <Adafruit_NeoPixel.h>
 #include "Arduino.h"
 
 
