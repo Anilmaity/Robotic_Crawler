@@ -17,6 +17,7 @@ void encoder_setup() {
 
 void updateEncoder() {
   // Read the state of the encoder pins
+  encoder_connect_time = millis();
   int encA_state = digitalRead(ENC_A);
   int encB_state = digitalRead(ENC_B);
 

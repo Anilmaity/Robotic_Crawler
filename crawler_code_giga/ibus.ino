@@ -45,7 +45,7 @@ void ibus_loop() {
 
     if (ch[5] >= 1200) {
       if (ch[3] <= 2000 && ch[3] >= 1000) {
-        bot_speed = map(ch[3], 1000, 2000, 500, -500);
+        bot_speed = map(ch[3], 1000, 2000, 1000, -1000);
       } else {
         bot_speed = 0;
       }
@@ -69,7 +69,11 @@ void ibus_loop() {
         auto_yaw = false;
         auto_pitch = false;
       }
-
+      if (abs(bot_direction) + abs(bot_speed) > 5) {
+        bot_mode = "ON";
+      } else {
+        bot_mode = "ON";
+      }
       if (ch[7] <= 2000 && ch[7] >= 1000) {
         if (ch[7] == 1000) {
         bot_mode = "AT";
@@ -100,11 +104,7 @@ void ibus_loop() {
         encoder_value = 0;  // 912
       }
 
-      if (abs(bot_direction) + abs(bot_speed) > 5) {
-        bot_mode = "ON";
-      } else {
-        bot_mode = "ON";
-      }
+
 
 
     } else {

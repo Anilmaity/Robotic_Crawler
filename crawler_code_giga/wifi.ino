@@ -3,8 +3,8 @@ const unsigned long mcu_startTime = millis();  // Capture start time
 const unsigned long session_id = random(1000000000, 9999999999);
 
 // WiFi credentials
-const char* ssid = "Anil";
-const char* password = "9558779895";
+const char* ssid = "AnilMaity";
+const char* password = "12345678";
 const char* ssid2 = "ARS";
 const char* password2 = "9925512860";
 const char* ssid3 = "Anmol's Iphone 2";

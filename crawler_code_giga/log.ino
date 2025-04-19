@@ -46,8 +46,8 @@ void serial_logs() {
   Serial.print(bot_mode);
   Serial.print(" "); // Serial.print(loop_time);
   // Serial.print(" ");
-  // Serial.print(bot_mode);
-  // Serial.print(" ");// Serial.print(" Mag: ");
+  Serial.print(encoder_value);
+  Serial.print(" ");// Serial.print(" Mag: ");
   // Serial.print(JY901.stcMag.h[0]);
   // Serial.print(" ");
   // Serial.print(JY901.stcMag.h[1]);
@@ -69,28 +69,32 @@ void comm_setup() {
 
 void send_data()
  {
-  int botinfo = 0;
   if (bot_mode == "OFF") botinfo = 0;
   else if (bot_mode == "ON") botinfo = 1;
   else if (bot_mode == "RCER") botinfo = 2;
   else if (bot_mode == "AT") botinfo = 3;
   else if (bot_mode == "N") botinfo = 4;
   else if (bot_mode == "360") botinfo = 5;
+  if ((millis() - encoder_connect_time) >  1000){encoder_connected = 0;}
+  else {encoder_connected = 1;}
+  
   
   Serial3.print(" ");
-  Serial3.print(roll);
+  Serial3.print(roll,2);
   Serial3.print(" ");
-  Serial3.print(pitch);
+  Serial3.print(pitch,2);
   Serial3.print(" ");
-  Serial3.print(yaw);
+  Serial3.print(yaw,2);
   Serial3.print(" ");
-  Serial3.print(distance_travel);
+  Serial3.print(distance_travel,2);
   Serial3.print(" ");
   Serial3.print(relay_value);
   Serial3.print(" ");
-  Serial3.print(wifi_connected);
+  Serial3.print(!wifi_connected);
   Serial3.print(" ");
   Serial3.print(botinfo);
   Serial3.print(" "); 
-  Serial3.println();
+  Serial3.print(encoder_connected);
+  Serial3.print(" ");
+   Serial3.println();
 }

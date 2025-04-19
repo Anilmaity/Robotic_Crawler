@@ -25,6 +25,7 @@ int ch[15];
 // Variables for RGB Control
 long int rgb_time = 0;
 bool lights_on = false;
+int botinfo = 0;
 
 
 int relay_pin1 = 21;
@@ -90,8 +91,9 @@ long rssi = 0;  // Get the RSSI value
 float current_value = 0;
 
 // Variable for Turning off Features
-bool turn_off_wifi_update = true;
+bool turn_off_wifi_update = false;
 bool turn_off_imu_update = false;
+
 bool turn_off_oled_update = true;
 bool turn_off_current_update = true;
 bool turn_off_stepper_update = false;
@@ -103,6 +105,8 @@ bool turn_off_serial_data = false;
 // Variable for Encoder
 volatile float distance_travel = -1000;
 volatile long int encoder_value = 0;
+volatile int encoder_connected = 0;
+volatile long int encoder_connect_time = 0;
 
 // Variable for Timers
 long int oled_update = 0;
@@ -132,7 +136,7 @@ void loop() {
   loop_time = millis() - loopstart;
   loopstart = millis();
 
-  //move_bot();
+  move_bot();
   light_operate();
 
 
