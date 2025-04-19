@@ -10,6 +10,7 @@ int headlight = 0;
 int wifi= 0 ;
 int bot_mode = 0;
 int groundstation_connected = false;
+int encorder_connected = 0;
 Arduino_H7_Video Display( 800, 480, GigaDisplayShield ); //( 800, 480, GigaDisplayShield );
 Arduino_GigaDisplayTouch TouchDetector;
 
@@ -26,6 +27,6 @@ void loop()
 
   data_loop();
   update_ui();
-  logs();
+  //logs();
 
 }

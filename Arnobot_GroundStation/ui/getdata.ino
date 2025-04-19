@@ -51,10 +51,10 @@ void extractData(String data) {
   }
 
   // Debug: Print extracted/ values
-  //Serial.print("Extracted: ");
-  //for (int i = 1; i < MAX_CHANNELS; i++) {
-  //Serial.print(ch[i]);
-  // Serial.print(" ");
-  //}
-  //Serial.println();
+  Serial.print("Extracted: ");
+  for (int i = 1; i < MAX_CHANNELS; i++) {
+  Serial.print(ch[i]);
+  Serial.print(" ");
+  }
+  Serial.println();
 }

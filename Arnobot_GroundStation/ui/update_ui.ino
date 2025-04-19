@@ -6,7 +6,7 @@ void update_ui() {
   headlight = ch[4];
   wifi = ch[5];
   bot_mode = ch[6];
-
+  encorder_connected = ch[7];
   if (String(roll) == "0.00" && String(pitch) == "0.00" & String(yaw) == "0.00") {
     lv_label_set_text(ui_imuStatus, String("disconnected").c_str());
     lv_obj_set_style_bg_color(ui_imuIndicator, lv_color_hex(0xFF0000), LV_PART_MAIN);  // Set Red color
@@ -22,7 +22,7 @@ void update_ui() {
 
 
 
-  if (String(distance) == "-1000.00") {
+  if (String(encorder_connected) == "0") {
     lv_label_set_text(ui_encoderStatus, String("disconnected").c_str());
     lv_obj_set_style_bg_color(ui_encoderIndicator, lv_color_hex(0xFF0000), LV_PART_MAIN);  // Set Red color
     lv_label_set_text(ui_encoderValue, (String(0) + " m").c_str());
