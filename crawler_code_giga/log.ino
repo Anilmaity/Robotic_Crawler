@@ -31,23 +31,23 @@ void serial_logs() {
 
 
   Serial.print(" ");
-  Serial.print(roll);
+  Serial.print(bot_speed);
   Serial.print(" ");
-  Serial.print(pitch);
+  Serial.print(bot_direction);
   Serial.print(" ");
-  Serial.print(yaw);
-  Serial.print(" ");
-  Serial.print(distance_travel);
-  Serial.print(" ");
-  Serial.print(relay_value);
-  Serial.print(" ");
-  Serial.print(wifi_connected);
-  Serial.print(" ");
-  Serial.print(bot_mode);
-  Serial.print(" "); // Serial.print(loop_time);
+  // Serial.print(yaw);
   // Serial.print(" ");
-  Serial.print(encoder_value);
-  Serial.print(" ");// Serial.print(" Mag: ");
+  // Serial.print(distance_travel);
+  // Serial.print(" ");
+  // Serial.print(relay_value);
+  // Serial.print(" ");
+  // Serial.print(wifi_connected);
+  // Serial.print(" ");
+  // Serial.print(bot_mode);
+  // Serial.print(" "); // Serial.print(loop_time);
+  // Serial.print(" ");
+ // Serial.print(encoder_value);
+  //Serial.print(" ");// Serial.print(" Mag: ");
   // Serial.print(JY901.stcMag.h[0]);
   // Serial.print(" ");
   // Serial.print(JY901.stcMag.h[1]);

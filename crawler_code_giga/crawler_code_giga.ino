@@ -53,7 +53,7 @@ int left_stepper_pin[3] = { 3, 2, 52 };
 // Variables for Bot Control
 int m1 = 0;
 int m2 = 0;
-int speed_setting = 700;
+int speed_setting = 600;
 float motor1_speed = 0;
 float motor2_speed = 0;
 int bot_speed = 0;
@@ -91,8 +91,8 @@ long rssi = 0;  // Get the RSSI value
 float current_value = 0;
 
 // Variable for Turning off Features
-bool turn_off_wifi_update = false;
-bool turn_off_imu_update = false;
+bool turn_off_wifi_update = true;
+bool turn_off_imu_update = true;
 
 bool turn_off_oled_update = true;
 bool turn_off_current_update = true;
@@ -118,7 +118,7 @@ long int loop_time = 0;
 void setup() {
 
   // put your setp code here, to run once:
-  Serial.begin(921600);
+  Serial.begin(1000000);
   Serial2.begin(9600);
   encoder_setup();
   ibus_setup();
@@ -141,7 +141,7 @@ void loop() {
 
 
 if (millis() - imu_start > 50) {
-    if (turn_off_imu_update == false) { imu(); }
+    //if (turn_off_imu_update == false) { imu(); }
     imu_start = millis();
     if (turn_off_serial_logs == false) { serial_logs();}
     if (turn_off_serial_data == false) {   send_data();}

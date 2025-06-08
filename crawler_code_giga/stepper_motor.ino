@@ -51,8 +51,8 @@ void move_bot() {
   motor2_speed = bot_speed - bot_direction - error_direction;
 
   // Constrain motor speeds within the limit [-500, 500]
-  motor1_speed = constrain(motor1_speed, -500, 500);
-  motor2_speed = constrain(motor2_speed, -500, 500);
+  motor1_speed = constrain(motor1_speed, -555, 555);
+  motor2_speed = constrain(motor2_speed, -555, 555);
 
   // Calculate the number of loops based on the speed (10 loops at speed 500)
   int motor1_loops = map(abs(motor1_speed), 0, 500, 0, 10);  // 0 to 10 loops for motor 1
@@ -63,11 +63,11 @@ void move_bot() {
   int max_loops = max(motor1_loops, motor2_loops);
   if (no_360 && motor1_speed > 0 && motor2_speed < 0) {
     motor1_speed = 0;
-    //motor1_speed = -motor1_speed;
+    motor2_speed = 0.8*motor2_speed;
   }
   if (no_360 && motor2_speed > 0 && motor1_speed < 0) {
     motor2_speed = 0;
-    //motor2_speed = -motor2_speed;
+    motor1_speed = 0.8*motor1_speed; //motor2_speed = -motor2_speed;
   }  // Loop according to the maximum number of loops
   for (int i = 0; i < max_loops; i++) {
     // Handle motor 1 direction and stepping if it still needs more loops
@@ -80,12 +80,12 @@ void move_bot() {
       } else {
         digitalWrite(right_stepper_pin[1], LOW);  // Set direction reverse
       }
-
+      delayMicroseconds(5);
       if (abs(motor1_speed) > min_speed) {
         digitalWrite(right_stepper_pin[0], HIGH);              // Step motor 1
         delayMicroseconds(speed_setting - abs(motor1_speed));  // Speed control for motor 1
         digitalWrite(right_stepper_pin[0], LOW);
-        delayMicroseconds(speed_setting - abs(motor1_speed));  // Pause between steps
+        //delayMicroseconds(speed_setting - abs(motor1_speed));  // Pause between steps
         total_steps += 1;
       }
     }
@@ -100,6 +100,7 @@ void move_bot() {
       } else {
         digitalWrite(left_stepper_pin[1], HIGH);  // Set direction reverse
       }
+      delayMicroseconds(5);
 
       if (abs(motor2_speed) > min_speed) {
         digitalWrite(left_stepper_pin[0], HIGH);               // Step motor 2
