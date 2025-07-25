@@ -45,30 +45,37 @@ void ibus_loop() {
 
     if (ch[5] >= 1200) {
       if (ch[3] <= 2000 && ch[3] >= 1000) {
-        bot_speed = map(ch[3], 1000, 2000, 555, -555);
+        bot_speed = map(ch[3], 1000, 2000, max_speed, -max_speed);
       } else {
         bot_speed = 0;
       }
 
 
-      if (ch[1] <= 2000 && ch[1] >= 1000) {
-        bot_direction = map(ch[1], 1000, 2000, -555, 555);  // 912
+      if (ch[1] <= 2000 && ch[1] >= 1000 ) {
+        if(ch[1] <= 1480 || ch[1] >= 1520)
+        {
+        bot_direction = map(ch[1], 1000, 2000, -max_speed, max_speed);  // 912
+        }else {
+        bot_direction = 0;  // 912
+      }
+
       } else {
         bot_direction = 0;  // 912
       }
 
-      if (ch[6] == 1500) {
-        auto_pitch = true;
-        auto_yaw = false;
+      if (ch[6] == 1000) {
+        auto_correct = "OFF";
 
       } else if (ch[6] == 2000) {
-        auto_yaw = true;
-        auto_pitch = false;
+        auto_correct = "YAW";
 
-      } else if (ch[6] == 2000) {
-        auto_yaw = false;
-        auto_pitch = false;
+
+      } else if (ch[6] == 1500) {
+        auto_correct = "ROLL";
+
       }
+
+
       if (abs(bot_direction) + abs(bot_speed) > 5) {
         bot_mode = "ON";
       } else {
@@ -84,14 +91,11 @@ void ibus_loop() {
         } else if (ch[7] == 1500) {
           bot_mode = "N";
           no_360 = true;  // 912
-          auto_pitch = false;
-          auto_yaw = false;
+        
 
         } else if (ch[7] == 2000) {
           bot_direction = bot_direction;  // 912
           no_360 = false;
-          auto_pitch = false;
-          auto_yaw = false;
           bot_mode = "360";
 
 
@@ -102,6 +106,8 @@ void ibus_loop() {
 
       if (ch[9] == 2000) {
         encoder_value = 0;  // 912
+        target_yaw_angle = float(yaw);
+
       }
 
 

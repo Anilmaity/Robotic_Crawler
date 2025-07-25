@@ -47,10 +47,10 @@ if __name__ == "__main__":
     #
     # generate_graph(length, width, height, grade)
 
-    t = [3.5 , 7,9.5,13,16.5,20 ,23.5]
-    ag = [0,1,2,3]
+    t = [3.5 , 7,9.5,13,16.5,20]
+    ag = [0,1.3,2,3]
 
-    B0 = 17*1.5
+    B0 = 17
 
     for j in range(len(ag)):
         for i in range(len(t)):

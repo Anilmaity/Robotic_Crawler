@@ -2,16 +2,16 @@
 //#include <ArduinoWebsockets.h>
 #include <Wire.h>
 #include <JY901.h>
-#include <WiFi.h>
-#include <WiFiClient.h>
+// #include <WiFi.h>
+// #include <WiFiClient.h>
 #include "Arduino.h"
 
 
 
-const char* serverName = "arnobot.live";  // Domain of your HTTP server
-const int serverPort = 80;
-const char* id = "96f63888-16c6-4dc5-a2ac-d5ff3e8f3117";
-WiFiClient client;  // Use WiFiClient for HTTP
+// const char* serverName = "arnobot.live";  // Domain of your HTTP server
+// const int serverPort = 80;
+// const char* id = "96f63888-16c6-4dc5-a2ac-d5ff3e8f3117";
+// WiFiClient client;  // Use WiFiClient for HTTP
 
 // Variables for Communication
 int channel_data[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -39,6 +39,7 @@ bool inspection_mode = false;
 // Variables for Auto Yaw
 float target_angle = 0;
 float error_direction = 0;
+float error_value = 0; 
 
 // Variables for Movement log
 long int right_motor_step_count = 0;
@@ -53,9 +54,13 @@ int left_stepper_pin[3] = { 3, 2, 52 };
 // Variables for Bot Control
 int m1 = 0;
 int m2 = 0;
-int speed_setting = 600;
+int speed_setting = 400;
+int max_speed = 600;
 float motor1_speed = 0;
 float motor2_speed = 0;
+int motor1_loops = 0;
+int motor2_loops = 0;
+int max_loops = 0;
 int bot_speed = 0;
 int bot_direction = 0;
 
@@ -67,15 +72,14 @@ float pitch = 0;
 float yaw = 0;
 
 // Variables for  Auto Position
-bool auto_yaw = false;
+String auto_correct = "OFF";
 double p_error = 0;
 double i_error = 0;
 double d_error = 0;
 
 double previous_error = 0;
-bool auto_pitch = false;
-bool target_pitch_angle = 0;
-bool target_yaw_angle = 0;
+float target_roll_angle = 0;
+float target_yaw_angle = 0;
 
 // Variables for Bot State
 bool rc_connected = false;
@@ -92,7 +96,7 @@ float current_value = 0;
 
 // Variable for Turning off Features
 bool turn_off_wifi_update = true;
-bool turn_off_imu_update = true;
+bool turn_off_imu_update = false;
 
 bool turn_off_oled_update = true;
 bool turn_off_current_update = true;
@@ -119,41 +123,41 @@ void setup() {
 
   // put your setp code here, to run once:
   Serial.begin(1000000);
-  Serial2.begin(9600);
+  // Serial2.begin(9600);
   encoder_setup();
   ibus_setup();
   stepper_setup();
   comm_setup();
   imu_start = millis();
   update_data = millis();
-  if (turn_off_wifi_update == false) { connectToWiFi(); }
-  light();
+  // if (turn_off_wifi_update == false) { connectToWiFi(); }
+  // light();
 }
 
 
 
 void loop() {
-  loop_time = millis() - loopstart;
-  loopstart = millis();
+  loop_time = micros() - loopstart;
+  loopstart = micros();
 
   move_bot();
-  light_operate();
+  //light_operate();
 
 
 if (millis() - imu_start > 50) {
-    //if (turn_off_imu_update == false) { imu(); }
+    // if (turn_off_imu_update == false) { imu(); }
     imu_start = millis();
     if (turn_off_serial_logs == false) { serial_logs();}
-    if (turn_off_serial_data == false) {   send_data();}
+    // if (turn_off_serial_data == false) {   send_data();}
 }
 
 
-  if (millis() - update_data > 3000) {
-    if (turn_off_wifi_update == false) { updateData(); }
+  // if (millis() - update_data > 3000) {
+  //   if (turn_off_wifi_update == false) { updateData(); }
 
-    //Serial.println(millis() - update_data);
-    update_data = millis();
-  }
+  //   //Serial.println(millis() - update_data);
+  //   update_data = millis();
+  // }
 
 
 }
