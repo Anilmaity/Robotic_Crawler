@@ -13,14 +13,16 @@ void throttle_setup() {
 
 void throttling() {
 
-  if (input_throttle > int(initial_throttle*1.1)) {
+  if (input_throttle > int(initial_throttle/2)) {
+    digitalWrite(Brake_pin, LOW);
+    // delay(1);
     digitalWrite(Reverse_pin, HIGH);
-    digitalWrite(Brake_pin, LOW);
 
 
-  } else if(input_throttle < int(-initial_throttle_backward*1.1)) {
-    digitalWrite(Reverse_pin, LOW);
-    digitalWrite(Brake_pin, LOW);
+  } else if(input_throttle < int(-initial_throttle_backward/2)) {
+      digitalWrite(Brake_pin, LOW);
+          // delay(1);
+      digitalWrite(Reverse_pin, LOW);
 
   }
   else{
@@ -34,12 +36,20 @@ void throttling() {
 
       
       if(input_throttle < initial_throttle){
-        input_throttle = initial_throttle;
+
+        if(input_throttle < -initial_throttle_backward/5 ){
+            input_throttle = input_throttle + speed_increase_rate_forward;
+
+        }
+        else{
+            input_throttle = initial_throttle;
+        }
+
       }
       else if(input_throttle < 0){
         input_throttle =  0 ;
       }
-      else if ( input_throttle < 78){
+      else if ( input_throttle < 100){
        input_throttle = input_throttle + speed_increase_rate_forward;
       }
       else
@@ -58,13 +68,21 @@ void throttling() {
 
     
     if(input_throttle > -initial_throttle_backward){
+      
+      if(input_throttle > initial_throttle_backward/5){
+
+        input_throttle = input_throttle - speed_increase_rate_backward; //
+
+      }
+      else{
         input_throttle = -initial_throttle_backward;
+      }
       }
     else if (throttle < input_throttle) {
       if(input_throttle > 0){
         input_throttle = 0 ;
       }
-      else if(input_throttle > -90){
+      else if(input_throttle > -100){
        input_throttle = input_throttle - speed_increase_rate_backward; //
 
       }

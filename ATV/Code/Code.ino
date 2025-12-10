@@ -3,7 +3,8 @@
 
 #define PIN_RX 10
 #define PIN_TX 9
-#define PIN_LED LED_BUILTIN
+#define PIN_LED 15
+#define LIGHT_LED 13
 
 // Set up a new Serial object
 HardwareSerial crsfSerial(1);
@@ -51,7 +52,7 @@ int brake_dir_pin = 5;
 
 bool braked = false; 
 
-int max_brake = 20;
+int max_brake = 19;
 
 
 // sterring_value
@@ -67,20 +68,22 @@ int p_sterring = 30;
 
 
 // throttle
-float speed_increase_rate_forward = 0.2;   // if you want to increase bot acceleration in forward direction
-float speed_increase_rate_backward = 0.2; // if you want to increase bot acceleration in reverse direction
+float speed_increase_rate_forward = 0.3;   // if you want to increase bot acceleration in forward direction
+float speed_increase_rate_backward = 0.3; // if you want to increase bot acceleration in reverse direction
 float speed_decrease_rate = 1;          // if you want to decrease bot acceleration in both direction
 
-int initial_throttle = 120;
-int initial_throttle_backward = 120;
-int max_limit = 200; // max speed limit
+int initial_throttle = 115;
+int initial_throttle_backward = 115;
+int max_limit = 202; // max speed limit
 int max_high_speed = 255;
-int max_low_speed = 200;
+int max_low_speed = 202;
 int throttle_pin = 2;
 int throttle = 0;
 double input_throttle = 0;
 
 
+// light
+bool light_on = false;
 
 
 void setup()
@@ -92,7 +95,7 @@ void setup()
   sterring_setup();
   throttle_setup();
   brake_setup();
-
+  light_setup();
 
 }
 
@@ -169,7 +172,8 @@ void loop()
   send_data();
   throttling();
   delay(5); // delay 1 millisecond
-   loop_time = millis() - loopstart;
+  updateLightStatus();
+  loop_time = millis() - loopstart;
 
 
 }

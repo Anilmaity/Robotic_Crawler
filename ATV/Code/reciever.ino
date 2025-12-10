@@ -10,7 +10,7 @@ void rc_setup()
 
   crsf.begin(crsfSerial);
   pinMode(PIN_LED, OUTPUT);
-  digitalWrite(PIN_LED, LOW);
+  digitalWrite(PIN_LED, HIGH);
 }
 
 void rc_loop()
@@ -36,11 +36,11 @@ void updateLinkStatusLed()
 {
   if(crsf.isLinkUp())
   {
-    digitalWrite(PIN_LED, HIGH);
+    digitalWrite(PIN_LED, LOW);
   }
   else
   {
-    digitalWrite(PIN_LED, LOW);
+    digitalWrite(PIN_LED, HIGH);
     // Perform the failsafe action
   }
 }
@@ -89,6 +89,20 @@ void evaluteinputs() {
       max_limit = max_low_speed;
     }
 
+
+       } 
+
+
+    if (ch[7] <= 2100 && ch[7] >= 900) {
+
+    if(ch[7] > 1600){
+
+      light_on = true;
+    }
+    else{
+
+      light_on  = false;
+    }
 
        } 
 
