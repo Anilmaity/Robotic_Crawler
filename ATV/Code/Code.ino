@@ -64,7 +64,18 @@ String binStr = "";
 long int sterring_value =180;
 long int error_sterring = 0;
 int sensorValue = -100;
-int p_sterring = 30;
+int p_sterring = 50;
+
+
+float default_acceleration = 0.3;
+float default_deacceleration = 1;
+
+float high_acceleration = 0.9;
+float high_deacceleration = 3;
+
+float very_high_acceleration = 2;
+float very_high_deacceleration = 6;
+
 
 
 // throttle

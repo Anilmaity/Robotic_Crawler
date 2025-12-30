@@ -72,7 +72,7 @@ void sterring_loop() {
 
   
 
-  if (abs(error_sterring) > 4) {
+  if (abs(error_sterring) > 3) {
     if (error_sterring > 0) {
       digitalWrite(S_DIR, HIGH); // direction right or left
     }

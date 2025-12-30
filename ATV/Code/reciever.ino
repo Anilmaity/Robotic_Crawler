@@ -68,6 +68,7 @@ void evaluteinputs() {
       sterring_value = map(ch[1], 1000, 1500, lowest_sterring_value, default_sterring_value); // 548 // 227
     } else {
       sterring_value = default_sterring_value;
+
     }
 
 
@@ -103,6 +104,40 @@ void evaluteinputs() {
 
       light_on  = false;
     }
+
+
+    if (ch[8] <= 2100 && ch[8] >= 900) {
+
+    if(ch[8] < 1400 && ch[8] > 900){
+
+      speed_increase_rate_forward = default_acceleration;  
+      speed_increase_rate_backward = default_acceleration; 
+      speed_decrease_rate = default_deacceleration; 
+    }
+    else if(ch[8] > 1400 && ch[8] < 1600){
+
+      speed_increase_rate_forward = high_acceleration;  
+      speed_increase_rate_backward = high_acceleration; 
+      speed_decrease_rate = high_deacceleration; 
+      
+          }
+        
+      else{
+
+
+      speed_increase_rate_forward = very_high_acceleration;  
+      speed_increase_rate_backward = very_high_acceleration; 
+      speed_decrease_rate = very_high_deacceleration; 
+
+      }
+
+
+       } 
+
+
+
+
+
 
        } 
 
