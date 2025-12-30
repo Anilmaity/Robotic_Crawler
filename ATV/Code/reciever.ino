@@ -105,7 +105,6 @@ void evaluteinputs() {
       light_on  = false;
     }
 
-
     if (ch[8] <= 2100 && ch[8] >= 900) {
 
     if(ch[8] < 1400 && ch[8] > 900){
