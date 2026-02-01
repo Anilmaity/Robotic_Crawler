@@ -1,89 +1,53 @@
 import serial
+import struct
 import cv2
 import numpy as np
-import struct
-import time
 
-# ==========================
-# Configuration
-# ==========================
-PORT = "COM16"
+PORT = "COM17"        # receiving port (change if needed)
 BAUD = 115200
-TIMEOUT = 2
 
-# For raw images (uncomment if your sender sends raw grayscale)
-IMG_WIDTH = 32
-IMG_HEIGHT = 32
+ser = serial.Serial(PORT, BAUD, timeout=5)
 
-# ==========================
-# Initialize Serial
-# ==========================
-ser = serial.Serial(PORT, BAUD, timeout=TIMEOUT)
-print("Receiving images...")
+print("Waiting for images...")
 
-# ==========================
-# Helper: Read exact number of bytes
-# ==========================
-def read_exact(ser, size):
-    """Read exactly `size` bytes from serial or return None if failed."""
-    data = b""
-    start_time = time.time()
-    while len(data) < size:
-        packet = ser.read(size - len(data))
-        if packet:
-            data += packet
-        else:
-            # Avoid infinite loop on timeout
-            if time.time() - start_time > TIMEOUT:
-                return None
-    return data
-
-# ==========================
-# Main loop
-# ==========================
-while True:
-    try:
-        # 1. Read 4-byte size header (big-endian)
-        size_bytes = read_exact(ser, 4)
-        if size_bytes is None:
-            print("Failed to read image size, retrying...")
+try:
+    while True:
+        # ---- READ IMAGE SIZE (4 bytes) ----
+        size_data = ser.read(4)
+        if len(size_data) != 4:
             continue
 
-        size = struct.unpack(">I", size_bytes)[0]
-        if size <= 0:
-            print("Invalid image size:", size)
+        img_size = struct.unpack(">I", size_data)[0]
+        print(f"Receiving image of {img_size} bytes")
+
+        # ---- READ IMAGE DATA ----
+        img_bytes = b""
+        while len(img_bytes) < img_size:
+            packet = ser.read(img_size - len(img_bytes))
+            if not packet:
+                break
+            img_bytes += packet
+
+        if len(img_bytes) != img_size:
+            print("Incomplete image received")
             continue
 
-        # 2. Read image data
-        data = read_exact(ser, size)
-        if data is None or len(data) != size:
-            print(f"Frame dropped! Expected {size}, got {len(data) if data else 0}")
-            continue
+        # ---- DECODE JPEG ----
+        np_img = np.frombuffer(img_bytes, dtype=np.uint8)
+        img = cv2.imdecode(np_img, cv2.IMREAD_GRAYSCALE)
 
-        # ==========================
-        # Option A: Compressed image (JPEG/PNG)
-        # ==========================
-        img = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
         if img is None:
-            print("Failed to decode image, skipping frame")
+            print("Decode failed")
             continue
 
-        # ==========================
-        # Option B: Raw grayscale (uncomment if using raw)
-        # ==========================
-        img = np.frombuffer(data, dtype=np.uint8).reshape((IMG_HEIGHT, IMG_WIDTH))
-
-        # 3. Display
-        cv2.imshow("RFD900X Image", img)
+        # ---- DISPLAY ----
+        cv2.imshow("RX Image", img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    except KeyboardInterrupt:
-        print("Exiting...")
-        break
-    except Exception as e:
-        print("Error:", e)
-        continue
+except KeyboardInterrupt:
+    print("Stopped")
 
-ser.close()
-cv2.destroyAllWindows()
+finally:
+    ser.close()
+    cv2.destroyAllWindows()
