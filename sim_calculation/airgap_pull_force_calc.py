@@ -45,15 +45,18 @@ if __name__ == "__main__":
     # grade = 'N52'
     #
     #
+
     # generate_graph(length, width, height, grade)
 
-    t = [3.5 , 7,9.5,13,16.5,20]
-    ag = [0,1.3,2,3]
+    t = [3.5 , 7,9.5,13]
+    ag = [0,0.5,0.8,1,1.3,1.5, 2]
 
-    B0 = 17
+    B0 = 32
 
     for j in range(len(ag)):
         for i in range(len(t)):
             strength = ((t[i]/(t[i]+ag[j]))*(t[i]/(t[i]+ag[j])))
             total = B0*strength*20
             print(f"thickness {t[i] } mm and air gap {ag[j]} mm {round(strength,3)}" , round(B0*strength) , round(total) , round(total/4))
+
+        print(" ")
