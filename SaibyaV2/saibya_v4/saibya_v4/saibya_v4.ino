@@ -1,4 +1,5 @@
 #include <AlfredoCRSF.h>
+#include "mbed.h"
 
 // ================= CONFIG =================
 #define MAX_CHANNELS 8
@@ -22,162 +23,139 @@ AlfredoCRSF crsf;
 
 // ================= GLOBALS =================
 uint16_t channels[MAX_CHANNELS];
-
 int bot_speed = 0;
 int bot_direction = 0;
 int motor_1_speed = 0;
 int motor_2_speed = 0;
 
+// ================= MBED PWM OBJECTS =================
+mbed::PwmOut* pwm1;
+mbed::PwmOut* pwm2;
+mbed::PwmOut* pwm3;
+mbed::PwmOut* pwm4;
+
 // ================= SETUP =================
 void setup() {
+    Serial.begin(921600);
+    Serial3.begin(CRSF_BAUDRATE);
+    crsf.begin(Serial3);
 
-  Serial.begin(921600);
+    // Motor pins as outputs
+    pinMode(M1_DIR, OUTPUT);
+    pinMode(M2_DIR, OUTPUT);
+    pinMode(M3_DIR, OUTPUT);
+    pinMode(M4_DIR, OUTPUT);
+    digitalWrite(M1_DIR, LOW);
+    digitalWrite(M2_DIR, LOW);
+    digitalWrite(M3_DIR, LOW);
+    digitalWrite(M4_DIR, LOW);
 
-  // CRSF runs at 420000 baud
-  Serial3.begin(CRSF_BAUDRATE);
-  crsf.begin(Serial3);
+    // Relays
+    pinMode(RELAY1_PIN, OUTPUT);
+    pinMode(RELAY2_PIN, OUTPUT);
 
-  motor_setup();
+    digitalWrite(RELAY1_PIN, HIGH);
+    digitalWrite(RELAY2_PIN, HIGH);
+
+    // Create mbed PwmOut objects
+    pwm1 = new mbed::PwmOut(digitalPinToPinName(M1_PWM));
+    pwm2 = new mbed::PwmOut(digitalPinToPinName(M2_PWM));
+    pwm3 = new mbed::PwmOut(digitalPinToPinName(M3_PWM));
+    pwm4 = new mbed::PwmOut(digitalPinToPinName(M4_PWM));
+
+    // Set PWM period for 20 kHz => period = 50 us
+    pwm1->period_us(50);
+    pwm2->period_us(50);
+    pwm3->period_us(50);
+    pwm4->period_us(50);
+
+    // Start with 0% duty
+    pwm1->write(0.0);
+    pwm2->write(0.0);
+    pwm3->write(0.0);
+    pwm4->write(0.0);
 }
 
 // ================= LOOP =================
 void loop() {
+    static unsigned long last_motor_update = 0;
+    static unsigned long last_debug = 0;
 
-  static unsigned long last_motor_update = 0;
-  static unsigned long last_debug = 0;
+    crsf.update();
+    bool rc_connected = crsf.isLinkUp();
 
-  crsf.update();
+    if (rc_connected) {
+        for (int i = 0; i < MAX_CHANNELS; i++) {
+            channels[i] = crsf.getChannel(i + 1);
+        }
 
-  bool rc_connected = crsf.isLinkUp();
+        bool armed = (channels[4] > 1400);
 
-  if (rc_connected) {
+        handleRelay(RELAY1_PIN, channels[5]);  // CH5 is index 4
+        handleRelay(RELAY2_PIN, channels[5]);  // CH5 is index 4
 
-    // Read channels
-    for (int i = 0; i < MAX_CHANNELS; i++) {
-      channels[i] = crsf.getChannel(i + 1);
-    }
+        if (armed) {
+            int throttle_input = channels[1];
+            bot_speed = throttle_input >= 1500
+                        ? (int)(255.0 * pow((throttle_input - 1500) / 400.0, 2))
+                        : -(int)(255.0 * pow((1500 - throttle_input) / 400.0, 2));
 
-    // ===== ARM SWITCH (CH6) =====
-    bool armed = (channels[4] > 1400);
-
-    // ===== RELAY CONTROL =====
-    digitalWrite(RELAY1_PIN, channels[5] > 1500 ? HIGH : LOW);  // CH6
-    digitalWrite(RELAY2_PIN, channels[5] > 1500 ? HIGH : LOW);  // CH7
-
-    if (armed) {
-
-      // ===== THROTTLE (CH2) =====
-      int throttle_input = channels[1];
-
-      if (throttle_input >= 1500) {
-        float x = (float)(throttle_input - 1500) / 400.0;
-        bot_speed = (int)(255.0 * x * x);
-      } else {
-        float x = (float)(1500 - throttle_input) / 400.0;
-        bot_speed = -(int)(255.0 * x * x);
-      }
-
-      // ===== STEERING (CH1) =====
-      int steer_input = channels[3];
-
-      if (steer_input >= 1500) {
-        float x = (float)(steer_input - 1500) / 400.0;
-        bot_direction = (int)(255.0 * x * x);
-      } else {
-        float x = (float)(1500 - steer_input) / 400.0;
-        bot_direction = -(int)(255.0 * x * x);
-      }
-
+            int steer_input = channels[3];
+            bot_direction = steer_input >= 1500
+                            ? -(int)(255.0 * pow((steer_input - 1500) / 400.0, 2))
+                            : (int)(255.0 * pow((1500 - steer_input) / 400.0, 2));
+        } else {
+            bot_speed = 0;
+            bot_direction = 0;
+        }
     } else {
-      // Not armed → motors off
-      bot_speed = 0;
-      bot_direction = 0;
+        bot_speed = 0;
+        bot_direction = 0;
+        // digitalWrite(RELAY1_PIN, LOW);
+        // digitalWrite(RELAY2_PIN, LOW);
     }
 
-  } else {
-    // ===== FAILSAFE =====
-    bot_speed = 0;
-    bot_direction = 0;
+    // Motor update @ 1kHz
+    if (micros() - last_motor_update >= 1000) {
+        last_motor_update = micros();
+        move_bot();
+    }
 
-    digitalWrite(RELAY1_PIN, LOW);
-    digitalWrite(RELAY2_PIN, LOW);
-  }
-
-  // ===== MOTOR UPDATE @ 1kHz =====
-  if (micros() - last_motor_update >= 1000) {
-    last_motor_update = micros();
-    move_bot();
-  }
-
-  // ===== DEBUG =====
-  if (millis() - last_debug > 100) {
-    last_debug = millis();
-    send_data();
-  }
+    // Debug
+    if (millis() - last_debug > 100) {
+        last_debug = millis();
+        send_data();
+    }
 }
 
 // ================= MOTOR LOGIC =================
 void move_bot() {
+    motor_1_speed = constrain(bot_speed - bot_direction, -255, 255);
+    motor_2_speed = constrain(bot_speed + bot_direction, -255, 255);
 
-  motor_1_speed = bot_speed - bot_direction;
-  motor_2_speed = bot_speed + bot_direction;
-
-  motor_1_speed = constrain(motor_1_speed, -255, 255);
-  motor_2_speed = constrain(motor_2_speed, -255, 255);
-
-  apply_pwm(M1_DIR, M1_PWM, motor_1_speed);
-  apply_pwm(M3_DIR, M3_PWM, motor_1_speed);
-  apply_pwm(M2_DIR, M2_PWM, motor_2_speed);
-  apply_pwm(M4_DIR, M4_PWM, motor_2_speed);
+    apply_pwm(M1_DIR, pwm1, motor_1_speed);
+    apply_pwm(M4_DIR, pwm4, -motor_1_speed);
+    apply_pwm(M2_DIR, pwm2, motor_2_speed);
+    apply_pwm(M3_DIR, pwm3, -motor_2_speed);
 }
 
-void apply_pwm(int dir_pin, int pwm_pin, int target) {
-
-  if (abs(target) > 12) {
-    digitalWrite(dir_pin, target > 0 ? HIGH : LOW);
-    analogWrite(pwm_pin, abs(target));
-  } else {
-    analogWrite(pwm_pin, 0);
-  }
-}
-
-// ================= SETUP MOTORS & RELAYS =================
-void motor_setup() {
-
-  pinMode(M1_DIR, OUTPUT); pinMode(M1_PWM, OUTPUT);
-  pinMode(M2_DIR, OUTPUT); pinMode(M2_PWM, OUTPUT);
-  pinMode(M3_DIR, OUTPUT); pinMode(M3_PWM, OUTPUT);
-  pinMode(M4_DIR, OUTPUT); pinMode(M4_PWM, OUTPUT);
-
-  analogWriteResolution(8);        // 0–255 like normal
-
-
-  pinMode(RELAY1_PIN, OUTPUT);
-  pinMode(RELAY2_PIN, OUTPUT);
-
-  digitalWrite(M1_DIR, LOW);
-  digitalWrite(M2_DIR, LOW);
-  digitalWrite(M3_DIR, LOW);
-  digitalWrite(M4_DIR, LOW);
-
-
+// ================= APPLY PWM =================
+void apply_pwm(int dir_pin, mbed::PwmOut* pwm, int target) {
+    if (abs(target) > 12) {
+        digitalWrite(dir_pin, target > 0 ? HIGH : LOW);
+        pwm->write(abs(target) / 255.0); // duty cycle 0.0–1.0
+    } else {
+        pwm->write(0.0);
+    }
 }
 
 // ================= DEBUG =================
 void send_data() {
-
-  Serial.print("CH1: ");
-  Serial.print(channels[3]);
-  Serial.print(" | CH2: ");
-  Serial.print(channels[1]);
-  Serial.print(" | Armed: ");
-  Serial.print(channels[5] > 1400);
-  Serial.print(" | Speed: ");
-  Serial.print(bot_speed);
-  Serial.print(" | Dir: ");
-  Serial.print(bot_direction);
-  Serial.print(" | Left: ");
-  Serial.print(motor_1_speed);
-  Serial.print(" | Right: ");
-  Serial.println(motor_2_speed);
+    Serial.print("CH1: "); Serial.print(channels[3]);
+    Serial.print(" | CH2: "); Serial.print(channels[1]);
+    Serial.print(" | Armed: "); Serial.print(channels[5] > 1400);
+    Serial.print(" | Speed: "); Serial.print(bot_speed);
+    Serial.print(" | Dir: "); Serial.print(bot_direction);
+    Serial.print(" | Left: "); Serial.print(motor_1_speed);
+    Serial.print(" | Right: "); Serial.println(motor_2_speed);
 }
