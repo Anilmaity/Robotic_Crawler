@@ -8,7 +8,7 @@
 
 
 // Set up a new Serial object
-HardwareSerial crsfSerial(1);
+HardwareSerial crsfSerial(2);
 AlfredoCRSF crsf;
 
 
