@@ -5,9 +5,13 @@
 // ================= CONFIG =================
 #define MAX_CHANNELS 8
 
+
+int maxMotors = 4;
+int maxspeed = 255;
 // Relay Pins
 #define RELAY1_PIN 38
 #define RELAY2_PIN 40
+
 
 // Motor Pins
 int M1_PWM = 4; // 4
@@ -35,6 +39,14 @@ int motor_1_speed = 0;
 int motor_2_speed = 0;
 
 
+int uart_bot_speed = 0;
+int uart_bot_direction = 0;
+int uart_m1_speed = 0;
+int uart_m2_speed = 0;
+int uart_m3_speed = 0;
+int uart_m4_speed = 0;
+
+
 
 String inputString = "";
 bool stringComplete = false;
@@ -48,8 +60,8 @@ mbed::PwmOut* pwm4;
 
 // ================= SETUP =================
 void setup() {
-  // Serial.begin(921600);
-  AT_Setup();
+  Serial.begin(921600);
+  Serial4.begin(250000);
   
   Serial3.begin(CRSF_BAUDRATE);
 
@@ -96,51 +108,6 @@ void setup() {
 void loop() {
   static unsigned long last_motor_update = 0;
   static unsigned long last_debug = 0;
-
-  crsf.update();
-  bool rc_connected = crsf.isLinkUp();
-
-  if (rc_connected) {
-    for (int i = 0; i < MAX_CHANNELS; i++) {
-      channels[i] = crsf.getChannel(i + 1);
-    }
-
-    bool armed = (channels[4] > 1400);
-
-    handleRelay(RELAY1_PIN, channels[5]);  // CH5 is index 4
-    //handleRelay(RELAY2_PIN, channels[5]);  // CH5 is index 4
-
-
-    if (armed) {
-
-    int throttle_input = channels[1];
-    int steer_input    = channels[3];
-
-    // Map CRSF range (~1000–2000) to -255 to 255
-    bot_speed     = map(throttle_input, 1000, 2000, -255, 255);
-    bot_direction = map(steer_input,    1000, 2000, -255, 255);
-
-    // Optional: small deadband around center
-    if (abs(bot_speed) < 10) bot_speed = 0;
-    if (abs(bot_direction) < 10) bot_direction = 0;
-
-    skid = (channels[6] > 1400);
-
-
-
-
-
-    } else {
-      bot_speed = 0;
-      bot_direction = 0;
-    }
-  } else {
-    bot_speed = 0;
-    bot_direction = 0;
-    // digitalWrite(RELAY1_PIN, LOW);
-    // digitalWrite(RELAY2_PIN, LOW);
-  }
-
   // Motor update @ 1kHz
   if (micros() - last_motor_update >= 1000) {
     last_motor_update = micros();
@@ -153,59 +120,13 @@ void loop() {
   //   send_data();
   // }
 
-    if (stringComplete) {
-    processATCommand(inputString);
-    inputString = "";
-    stringComplete = false;
-  }
+  rc_read();
+  read_loop();
 
+  
+ 
 }
 
-// ================= MOTOR LOGIC =================
-
-void move_bot() {
-
-  if (skid) {
-
-
-    motor_1_speed = constrain(bot_speed + bot_direction, -255, 255);
-    motor_2_speed = constrain(bot_speed - bot_direction, -255, 255);
-
-  }
-
-  else {
-
-    if (bot_direction > 0) {
-      motor_1_speed = constrain(bot_speed + bot_direction , -255, 255);
-      motor_2_speed = constrain(bot_speed , -255, 255);
-
-    } 
-
-    
-
-    else {
-      motor_1_speed = constrain(bot_speed, -255, 255);
-      motor_2_speed = constrain(bot_speed - bot_direction , -255, 255);
-    }
-
-
-  }
-
-  apply_pwm(M1_DIR, pwm1, -motor_1_speed);
-  apply_pwm(M4_DIR, pwm4, motor_1_speed);
-  apply_pwm(M2_DIR, pwm2, -motor_2_speed);
-  apply_pwm(M3_DIR, pwm3, motor_2_speed);
-}
-
-// ================= APPLY PWM =================
-void apply_pwm(int dir_pin, mbed::PwmOut* pwm, int target) {
-  if (abs(target) > 12) {
-    digitalWrite(dir_pin, target > 0 ? HIGH : LOW);
-    pwm->write(abs(target) / 255.0);  // duty cycle 0.0–1.0
-  } else {
-    pwm->write(0.0);
-  }
-}
 
 // ================= DEBUG =================
 void send_data() {
