@@ -1,6 +1,6 @@
 
 
-void rc_read(){
+bool rc_read(){
 
   
   crsf.update();
@@ -14,7 +14,6 @@ void rc_read(){
     bool armed = (channels[4] > 1400);
 
     handleRelay(RELAY1_PIN, channels[5]);  // CH5 is index 4
-    //handleRelay(RELAY2_PIN, channels[5]);  // CH5 is index 4
 
 
     if (armed) {
@@ -32,19 +31,20 @@ void rc_read(){
 
     skid = (channels[6] > 1400);
 
+    return true;
 
 
-
-
-    } else {
+    } else 
+    {
       bot_speed = 0;
       bot_direction = 0;
     }
-  } else {
-    bot_speed = 0;
-    bot_direction = 0;
-    // digitalWrite(RELAY1_PIN, LOW);
-    // digitalWrite(RELAY2_PIN, LOW);
+  }
+   else 
+  {
+
+    return false;
+
   }
 
 

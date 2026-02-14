@@ -45,6 +45,7 @@ int uart_m1_speed = 0;
 int uart_m2_speed = 0;
 int uart_m3_speed = 0;
 int uart_m4_speed = 0;
+bool resp_rc = false;
 
 
 
@@ -60,7 +61,8 @@ mbed::PwmOut* pwm4;
 
 // ================= SETUP =================
 void setup() {
-  Serial.begin(921600);
+  Serial.begin(250000);
+  Serial1.begin(250000);
   Serial4.begin(250000);
   
   Serial3.begin(CRSF_BAUDRATE);
@@ -111,7 +113,15 @@ void loop() {
   // Motor update @ 1kHz
   if (micros() - last_motor_update >= 1000) {
     last_motor_update = micros();
-    move_bot();
+
+    if(resp_rc){
+      move_bot_rc();
+    }
+    else{
+      move_bot_uart();
+    }
+
+    
   }
 
   // Debug
@@ -120,8 +130,10 @@ void loop() {
   //   send_data();
   // }
 
-  rc_read();
-  read_loop();
+  resp_rc = rc_read();
+  rc_loop();
+  c_loop();
+
 
   
  

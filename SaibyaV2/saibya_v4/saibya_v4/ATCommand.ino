@@ -1,9 +1,15 @@
 
 
-void rc_read() {
-  if (Serial4.available() > 0) {
-    String command = Serial4.readStringUntil('\n'); // read one line
-    command.trim(); // remove whitespace
+void rc_loop() {
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');  // read one line
+    command.trim();                                 // remove whitespace
+
+    if (command == "PING") {
+      Serial.println("OK");
+      return;  // stop here, do not parse as motor command
+    }
+
 
     // Check format
     if (command.startsWith("M-")) {
@@ -16,24 +22,40 @@ void rc_read() {
 
         int speed = speedStr.toInt();
 
-        if (speed < -255 || speed > 255) {
-          Serial.println("Error: Speed out of range (-255 to 255)");
+        if (speed < -100 || speed > 100) {
+          Serial.println("Error: Speed out of range (-100 to 100)");
           return;
         }
 
         if (motorStr == "A") {
-          // All motors
-          Serial.print("All motors set to speed: ");
-          Serial.println(speed);
-          for (int i = 0; i < maxMotors; i++) {
-            Serial.print("Motor "); Serial.print(i);
-            Serial.print(" -> Speed: "); Serial.println(speed);
-          }
-        } else {
+          uart_bot_speed = speed;
+          Serial.println("OK");
+
+
+        } else if (motorStr == "D") {
+
+          uart_bot_direction = speed;
+          Serial.println("OK");
+
+        }
+
+        else {
           int motor = motorStr.toInt();
+
           if (motor >= 0 && motor < maxMotors) {
-            Serial.print("Motor "); Serial.print(motor);
-            Serial.print(" -> Speed: "); Serial.println(speed);
+
+            if (motor == 1) {
+              uart_m1_speed = speed;
+            } else if (motor == 2) {
+              uart_m2_speed = speed;
+
+            } else if (motor == 3) {
+              uart_m3_speed = speed;
+
+            } else if (motor == 4) {
+              uart_m4_speed = speed;
+            }
+
           } else {
             Serial.println("Error: Motor number out of range");
           }
