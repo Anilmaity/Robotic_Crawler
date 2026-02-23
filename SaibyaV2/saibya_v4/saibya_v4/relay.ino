@@ -15,9 +15,9 @@ void handleRelay(int relayPin, uint16_t ch5_value) {
 
         for (int i = 0; i < triggerTimes; i++) {
             digitalWrite(relayPin, HIGH);
-            delay(50);           // relay ON for 50ms
+            delay(100);           // relay ON for 50ms
             digitalWrite(relayPin, LOW);
-            delay(50);           // relay OFF for 50ms
+            delay(100);           // relay OFF for 50ms
         }
 
         firstStart = false;  // after first trigger, set firstStart false

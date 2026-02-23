@@ -14,9 +14,9 @@ int maxspeed = 255;
 
 
 // Motor Pins
-int M1_PWM = 4; // 4
-int M1_DIR = 5; // 5
-int M2_PWM = 2; // 
+int M1_PWM = 4;  // 4
+int M1_DIR = 5;  // 5
+int M2_PWM = 2;  //
 int M2_DIR = 3;
 int M3_PWM = 6;
 int M3_DIR = 7;
@@ -64,7 +64,7 @@ void setup() {
   Serial.begin(250000);
   Serial1.begin(250000);
   Serial4.begin(250000);
-  
+
   Serial3.begin(CRSF_BAUDRATE);
 
   crsf.begin(Serial3);
@@ -103,7 +103,6 @@ void setup() {
   pwm2->write(0.0);
   pwm3->write(0.0);
   pwm4->write(0.0);
-
 }
 
 // ================= LOOP =================
@@ -114,14 +113,15 @@ void loop() {
   if (micros() - last_motor_update >= 1000) {
     last_motor_update = micros();
 
-    if(resp_rc){
-      move_bot_rc();
-    }
-    else{
+    if (resp_rc) {
+      if (channels[7] < 1600) {
+        move_bot_rc();
+      } else {
+        move_bot_uart();
+      }
+    } else {
       move_bot_uart();
     }
-
-    
   }
 
   // Debug
@@ -133,10 +133,6 @@ void loop() {
   resp_rc = rc_read();
   rc_loop();
   c_loop();
-
-
-  
- 
 }
 
 

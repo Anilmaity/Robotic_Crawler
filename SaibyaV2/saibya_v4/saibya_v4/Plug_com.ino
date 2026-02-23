@@ -2,12 +2,12 @@
 
 void c_loop() {
   if (Serial4.available() > 0) {
-    String command = Serial4.readStringUntil('\n'); // read one line
-    command.trim(); // remove whitespace
+    String command = Serial4.readStringUntil('\n');  // read one line
+    command.trim();                                 // remove whitespace
 
-        if (command == "PING") {
+    if (command == "PING") {
       Serial.println("OK");
-      return;   // stop here, do not parse as motor command
+      return;  // stop here, do not parse as motor command
     }
 
 
@@ -22,43 +22,38 @@ void c_loop() {
 
         int speed = speedStr.toInt();
 
-        if (speed < -100 || speed > 100) {
-          Serial.println("Error: Speed out of range (-100 to 100)");
+        if (speed < -255 || speed > 255) {
+          Serial.println("Error: Speed out of range (-255 to 255)");
           return;
         }
 
         if (motorStr == "A") {
           uart_bot_speed = speed;
-                Serial.println("OK");
+          Serial.println("OK");
 
 
-        }
-        else if(motorStr == "D") {
+        } else if (motorStr == "D") {
 
           uart_bot_direction = speed;
-      Serial.println("OK");
+          Serial.println("OK");
 
-          }
-        
-         else {
+        }
+
+        else {
           int motor = motorStr.toInt();
-          
+
           if (motor >= 0 && motor < maxMotors) {
 
-            if(motor == 1){
+            if (motor == 1) {
               uart_m1_speed = speed;
-            }
-            else if(motor == 2){
-                uart_m2_speed = speed;
+            } else if (motor == 2) {
+              uart_m2_speed = speed;
 
-            }
-            else if(motor == 3){
-                uart_m3_speed = speed;
+            } else if (motor == 3) {
+              uart_m3_speed = speed;
 
-            }
-            else if(motor == 4){
-                uart_m4_speed = speed;
-
+            } else if (motor == 4) {
+              uart_m4_speed = speed;
             }
 
           } else {

@@ -9,6 +9,7 @@ void rc_loop() {
       Serial.println("OK");
       return;  // stop here, do not parse as motor command
     }
+    
 
 
     // Check format
@@ -22,13 +23,18 @@ void rc_loop() {
 
         int speed = speedStr.toInt();
 
-        if (speed < -100 || speed > 100) {
-          Serial.println("Error: Speed out of range (-100 to 100)");
+        if (speed < -255 || speed > 255) {
+          Serial.println("Error: Speed out of range (-255 to 255)");
           return;
         }
 
         if (motorStr == "A") {
           uart_bot_speed = speed;
+          uart_m1_speed = speed;
+          uart_m2_speed = speed;
+          uart_m3_speed = speed;
+          uart_m4_speed = speed;
+
           Serial.println("OK");
 
 
@@ -42,7 +48,7 @@ void rc_loop() {
         else {
           int motor = motorStr.toInt();
 
-          if (motor >= 0 && motor < maxMotors) {
+          if (motor >= 0 && motor <= maxMotors) {
 
             if (motor == 1) {
               uart_m1_speed = speed;

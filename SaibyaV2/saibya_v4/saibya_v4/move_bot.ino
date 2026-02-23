@@ -1,18 +1,10 @@
 
 void move_bot_rc() {
 
-  if (skid) {
 
 
-    motor_1_speed = constrain(bot_speed - bot_direction, -255, 255);
-    motor_2_speed = constrain(bot_speed + bot_direction, -255, 255);
-
-  }
-
-  else {
-
-    if (bot_direction > 0) {
-      if (bot_speed > 0) {
+    if (bot_direction >= 0) {
+      if (bot_speed >= 0) {
         motor_1_speed = constrain(bot_speed, -255, 255);
         motor_2_speed = constrain(bot_speed + bot_direction, -255, 255);
       } else {
@@ -36,7 +28,7 @@ void move_bot_rc() {
         motor_2_speed = constrain(bot_speed, -255, 255);
       }
     }
-  }
+  
 
   apply_pwm(M1_DIR, pwm1, -motor_1_speed);
   apply_pwm(M4_DIR, pwm4, motor_1_speed);
